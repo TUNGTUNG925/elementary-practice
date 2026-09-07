@@ -5,71 +5,106 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>國小國語・數學綜合練習</title>
   <style>
-    :root { --primary:#2563eb; --accent:#f59e0b; --ok:#15803d; --bad:#dc2626; --ink:#1f2937; --bg:#eef6ff; }
+    :root { --primary:#2563eb; --primary-dark:#1d4ed8; --green:#15803d; --red:#dc2626; --ink:#1f2937; --muted:#64748b; --line:#dbe3ef; }
     * { box-sizing:border-box; }
     body { margin:0; font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif; color:var(--ink); background:linear-gradient(135deg,#e0f2fe,#fef3c7); min-height:100vh; }
-    .wrap { max-width:900px; margin:auto; padding:28px 16px 48px; }
+    .wrap { max-width:960px; margin:auto; padding:28px 16px 50px; }
     header { text-align:center; margin-bottom:22px; }
-    h1 { margin:0; font-size:clamp(1.7rem,5vw,2.45rem); color:#1d4ed8; }
+    h1 { margin:0; color:#1d4ed8; font-size:clamp(1.7rem,5vw,2.45rem); }
     header p { margin:8px 0 0; color:#475569; }
-    .card { background:rgba(255,255,255,.96); border-radius:20px; padding:22px; box-shadow:0 12px 32px rgba(30,64,175,.15); }
+    .card { background:rgba(255,255,255,.96); border-radius:20px; padding:24px; box-shadow:0 12px 32px rgba(30,64,175,.15); }
     .hidden { display:none !important; }
-    h2 { margin:0 0 14px; font-size:1.28rem; }
-    .subject-row,.grade-grid { display:flex; gap:12px; flex-wrap:wrap; }
-    .subject-btn { flex:1 1 180px; border:3px solid #bfdbfe; background:#eff6ff; border-radius:16px; min-height:78px; cursor:pointer; font-size:1.2rem; font-weight:700; color:#1e40af; }
+    h2 { margin:0 0 14px; font-size:1.25rem; }
+    h3 { margin:20px 0 10px; font-size:1.05rem; }
+    .subject-row,.grade-grid,.mode-grid,.number-grid { display:flex; flex-wrap:wrap; gap:12px; }
+    .subject-btn { flex:1 1 180px; min-height:78px; border:3px solid #bfdbfe; background:#eff6ff; border-radius:16px; cursor:pointer; color:#1e40af; font-size:1.2rem; font-weight:700; }
     .subject-btn.active { border-color:var(--primary); background:#dbeafe; box-shadow:0 0 0 3px #bfdbfe; }
-    .grade-label { display:flex; align-items:center; justify-content:center; gap:7px; flex:1 1 140px; min-height:54px; padding:8px; border:2px solid #e2e8f0; border-radius:12px; cursor:pointer; font-size:1.05rem; font-weight:700; }
-    .grade-label:has(input:checked) { background:#ecfdf5; border-color:#22c55e; color:#166534; }
-    input[type="checkbox"] { width:19px; height:19px; accent-color:#16a34a; }
-    .actions { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:22px; }
+    .grade-label,.type-label { display:flex; align-items:center; justify-content:center; gap:7px; flex:1 1 140px; min-height:52px; padding:8px 10px; border:2px solid #e2e8f0; border-radius:12px; cursor:pointer; font-size:1rem; font-weight:700; }
+    .grade-label:has(input:checked),.type-label:has(input:checked) { background:#ecfdf5; border-color:#22c55e; color:#166534; }
+    .number-btn { flex:1 1 95px; min-height:50px; border:2px solid #cbd5e1; background:#fff; color:#334155; }
+    .number-btn.active { background:#dbeafe; border-color:var(--primary); color:#1d4ed8; }
+    input[type="checkbox"] { width:18px; height:18px; accent-color:#16a34a; }
+    input[type="text"] { width:100%; padding:12px 14px; border:2px solid #cbd5e1; border-radius:12px; font:inherit; font-size:1rem; }
+    .actions { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:22px; }
     button { border:0; border-radius:12px; padding:12px 19px; cursor:pointer; font-size:1rem; font-weight:700; }
-    .primary { background:var(--primary); color:#fff; } .primary:hover { background:#1d4ed8; }
+    .primary { background:var(--primary); color:white; } .primary:hover { background:var(--primary-dark); }
     .secondary { background:#e2e8f0; color:#334155; } .secondary:hover { background:#cbd5e1; }
-    .quiz-top { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
-    .badge { display:inline-block; padding:6px 10px; border-radius:999px; background:#dbeafe; color:#1d4ed8; font-weight:700; }
+    .danger { background:#fee2e2; color:#991b1b; } .danger:hover { background:#fecaca; }
+    .small { padding:8px 12px; font-size:.9rem; }
+    .quiz-top { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
+    .badges { display:flex; flex-wrap:wrap; gap:7px; }
+    .badge { display:inline-block; padding:6px 10px; border-radius:999px; background:#dbeafe; color:#1d4ed8; font-weight:700; font-size:.94rem; }
     .score { font-weight:700; color:#475569; }
-    .question-box { background:#f8fafc; border:2px solid #e2e8f0; border-radius:16px; padding:20px; }
+    .progress { height:9px; background:#e2e8f0; border-radius:99px; overflow:hidden; margin:12px 0 0; }
+    .progress > div { height:100%; width:0; background:linear-gradient(90deg,#22c55e,#3b82f6); transition:width .25s; }
+    .tips { color:var(--muted); font-size:.92rem; margin:12px 0 0; text-align:center; }
+    .question-box { margin-top:14px; background:#f8fafc; border:2px solid #e2e8f0; border-radius:16px; padding:20px; }
     .question { white-space:pre-line; font-size:1.35rem; font-weight:700; line-height:1.7; margin:0 0 18px; }
     .options { display:grid; gap:10px; }
-    .option { width:100%; text-align:left; background:#fff; border:2px solid #cbd5e1; color:#334155; padding:13px 15px; border-radius:12px; font-weight:600; }
+    .option { width:100%; text-align:left; background:white; border:2px solid #cbd5e1; color:#334155; padding:13px 15px; border-radius:12px; font-weight:600; }
     .option:hover:not(:disabled) { border-color:#60a5fa; background:#eff6ff; }
     .option.correct { background:#dcfce7; border-color:#22c55e; color:#166534; }
     .option.wrong { background:#fee2e2; border-color:#ef4444; color:#991b1b; }
-    .feedback { min-height:31px; margin:15px 0 0; font-size:1.05rem; font-weight:700; line-height:1.5; }
-    .feedback.ok { color:var(--ok); } .feedback.bad { color:var(--bad); }
-    .tips { font-size:.92rem; color:#64748b; margin:16px 0 0; text-align:center; }
-    .progress { height:9px; background:#e2e8f0; border-radius:99px; overflow:hidden; margin:12px 0 0; }
-    .progress > div { height:100%; width:0; background:linear-gradient(90deg,#22c55e,#3b82f6); transition:width .25s; }
-    @media (max-width:520px) { .card{padding:17px} .question{font-size:1.18rem} }
+    .feedback { min-height:31px; margin:15px 0 0; font-size:1.05rem; font-weight:700; line-height:1.55; }
+    .feedback.ok { color:var(--green); } .feedback.bad { color:var(--red); }
+    .work-area { margin-top:16px; background:#fffdf4; border:2px dashed #f59e0b; border-radius:16px; padding:14px; }
+    .work-area h3 { margin:0 0 8px; color:#92400e; }
+    .work-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+    #workCanvas { display:block; width:100%; height:260px; background:#fff; border:2px solid #cbd5e1; border-radius:12px; touch-action:none; cursor:crosshair; }
+    .result-title { text-align:center; color:#1d4ed8; font-size:1.65rem; margin:0 0 10px; }
+    .result-score { text-align:center; font-size:1.35rem; font-weight:800; color:#166534; margin:8px 0; }
+    .result-message { text-align:center; color:#475569; margin:8px 0 20px; }
+    .wrong-list { display:grid; gap:12px; margin-top:15px; }
+    .wrong-card { border:2px solid #fecaca; background:#fff7f7; border-radius:14px; padding:14px; }
+    .wrong-card p { margin:5px 0; line-height:1.55; white-space:pre-line; }
+    .wrong-card .answer { color:#166534; font-weight:700; }
+    .empty { padding:20px; text-align:center; color:#166534; background:#ecfdf5; border-radius:14px; font-weight:700; }
+    @media (max-width:560px) { .card{padding:17px} .question{font-size:1.18rem} #workCanvas{height:210px} .grade-label,.type-label{flex-basis:125px} }
   </style>
 </head>
 <body>
   <main class="wrap">
     <header>
       <h1>🌟 國小綜合練習</h1>
-      <p>先選科目，再勾選一個或多個年級；題目會隨機、不重複抽出。</p>
+      <p>選科目、年級與題型，完成一份專屬練習卷。</p>
     </header>
 
     <section id="setup" class="card">
       <h2>1. 選擇科目</h2>
-      <div class="subject-row" aria-label="選擇科目">
+      <div class="subject-row">
         <button class="subject-btn" type="button" data-subject="國語">📖 國語</button>
         <button class="subject-btn" type="button" data-subject="數學">🔢 數學</button>
       </div>
-      <h2 style="margin-top:24px">2. 複選要練習的年級</h2>
+
+      <h2 style="margin-top:24px">2. 複選年級</h2>
       <div class="grade-grid">
         <label class="grade-label"><input type="checkbox" value="1">一年級</label>
         <label class="grade-label"><input type="checkbox" value="2">二年級</label>
         <label class="grade-label"><input type="checkbox" value="3">三年級</label>
         <label class="grade-label"><input type="checkbox" value="4">四年級</label>
       </div>
-      <div class="actions"><button id="startBtn" class="primary" type="button">開始練習</button></div>
-      <p class="tips">每個科目、每個年級約有 24 題；可重複按「換一題」持續練習。</p>
+
+      <h2 style="margin-top:24px">3. 選擇題型（可複選）</h2>
+      <div id="typeFilters" class="mode-grid"></div>
+      <p class="tips">不勾選題型時，會自動包含所選年級的全部題型。</p>
+
+      <h2 style="margin-top:24px">4. 設定測驗</h2>
+      <h3>學生姓名（選填）</h3>
+      <input id="studentName" type="text" maxlength="20" placeholder="例如：小明">
+      <h3>題數</h3>
+      <div class="number-grid" id="countButtons">
+        <button class="number-btn active" type="button" data-count="10">10 題</button>
+        <button class="number-btn" type="button" data-count="20">20 題</button>
+        <button class="number-btn" type="button" data-count="30">30 題</button>
+        <button class="number-btn" type="button" data-count="0">全部</button>
+      </div>
+      <div class="actions"><button id="startBtn" class="primary" type="button">開始測驗</button></div>
+      <p class="tips">題目與選項都會隨機排列；若所選題庫不足設定題數，會自動使用可用題目數。</p>
     </section>
 
     <section id="quiz" class="card hidden" aria-live="polite">
       <div class="quiz-top">
-        <div><span id="subjectBadge" class="badge"></span> <span id="gradeBadge" class="badge"></span> <span id="type" class="badge"></span></div>
+        <div class="badges"><span id="subjectBadge" class="badge"></span><span id="gradeBadge" class="badge"></span><span id="typeBadge" class="badge"></span></div>
         <div id="score" class="score">答對 0／0 題</div>
       </div>
       <div class="progress"><div id="progressBar"></div></div>
@@ -79,312 +114,391 @@
         <div id="options" class="options"></div>
         <p id="feedback" class="feedback"></p>
       </div>
+
+      <section id="workArea" class="work-area hidden">
+        <div class="work-row"><h3>✏️ 數學驗算區</h3><button id="clearCanvasBtn" class="danger small" type="button">清除筆跡</button></div>
+        <p class="tips" style="margin:0 0 9px">可用滑鼠、手指或觸控筆在空白處手寫驗算。</p>
+        <canvas id="workCanvas" aria-label="數學手寫驗算區"></canvas>
+      </section>
+
       <div class="actions">
-        <button id="nextBtn" class="primary" type="button">換一題</button>
-        <button id="backBtn" class="secondary" type="button">重新選擇</button>
+        <button id="nextBtn" class="primary" type="button">下一題</button>
+        <button id="submitBtn" class="secondary" type="button">提早交卷</button>
+        <button id="backBtn" class="secondary" type="button">重新設定</button>
+      </div>
+    </section>
+
+    <section id="result" class="card hidden">
+      <h2 class="result-title">🎉 測驗完成</h2>
+      <p id="resultName" class="result-message"></p>
+      <p id="resultScore" class="result-score"></p>
+      <p id="resultMessage" class="result-message"></p>
+      <h3>錯題整理</h3>
+      <div id="wrongList" class="wrong-list"></div>
+      <div class="actions">
+        <button id="retryWrongBtn" class="primary" type="button">只練錯題</button>
+        <button id="newTestBtn" class="secondary" type="button">重新設定新測驗</button>
       </div>
     </section>
   </main>
 
 <script>
-const questionBank = [
-  {subject:'國語',grade:1,type:'拼字',q:'「太陽」的「陽」讀音最接近哪一個？',options:['洋','羊','樣','揚'],answer:1,explain:'「陽」和「羊」都讀 ㄧㄤˊ。'},
-  {subject:'國語',grade:1,type:'選正確形容詞',q:'請選出最適合的詞：\n「蘋果吃起來＿＿＿的。」',options:['甜甜','跑跑','看看','睡睡'],answer:0,explain:'「甜甜」可以形容蘋果的味道。'},
-  {subject:'國語',grade:1,type:'造句',q:'哪一句話正確使用了「開心」？',options:['我今天得到禮物，覺得很開心。','開心在桌上寫字。','媽媽買開心回家。','小狗開心一碗飯。'],answer:0,explain:'「開心」用來形容快樂的心情。'},
-  {subject:'國語',grade:1,type:'選正確形容詞',q:'請選出最適合的詞：\n「白白的＿＿＿在天空飄。」',options:['雲朵','石頭','書包','鉛筆'],answer:0,explain:'白白的雲朵會在天空飄。'},
-  {subject:'國語',grade:1,type:'拼字',q:'「花朵」的「朵」有幾畫？',options:['5畫','6畫','7畫','8畫'],answer:1,explain:'「朵」共有 6 畫。'},
-  {subject:'國語',grade:1,type:'選正確詞語',q:'請選出可以放進句子的詞：\n「我每天＿＿＿去上學。」',options:['快快','高高','天天','早早'],answer:3,explain:'「早早去上學」語意最通順。'},
-  {subject:'國語',grade:1,type:'造句',q:'哪一句正確使用了「一起」？',options:['我和弟弟一起看故事書。','一起書包在桌上。','媽媽一起買菜。','小鳥一起天空。'],answer:0,explain:'「一起」表示共同做一件事。'},
-  {subject:'國語',grade:1,type:'選正確形容詞',q:'請選出最適合的詞：\n「冰淇淋吃起來＿＿＿的。」',options:['冰冰','熱熱','長長','高高'],answer:0,explain:'冰淇淋的感覺是冰冰的。'},
-  {subject:'國語',grade:1,type:'拼字',q:'下面哪一個字和「手」有關？',options:['打','唱','明','花'],answer:0,explain:'「打」要用手來做。'},
-  {subject:'國語',grade:1,type:'句子排序',q:'請選出正確的句子。',options:['小狗在院子裡跑。','在小狗跑院子裡。','院子裡小狗在跑。','跑小狗在裡院子。'],answer:0,explain:'「小狗在院子裡跑。」語序完整又通順。'},
-  {subject:'國語',grade:1,type:'選正確形容詞',q:'請選出最適合的詞：\n「長頸鹿有＿＿＿的脖子。」',options:['長長','短短','小小','圓圓'],answer:0,explain:'長頸鹿的脖子長長的。'},
-  {subject:'國語',grade:1,type:'拼字',q:'「雨」是什麼部首？',options:['雨','水','天','日'],answer:0,explain:'「雨」本身就是一個部首。'},
-  {subject:'國語',grade:1,type:'造句',q:'哪一句話正確使用了「喜歡」？',options:['我喜歡吃媽媽煮的飯。','喜歡在桌上一本書。','小狗喜歡很可愛。','媽媽買喜歡回家。'],answer:0,explain:'「喜歡」可以說明自己愛好的事物。'},
-  {subject:'國語',grade:1,type:'選正確詞語',q:'「爸爸在＿＿＿看報紙。」',options:['客廳','天空','書包','鉛筆'],answer:0,explain:'爸爸可以在客廳看報紙。'},
-  {subject:'國語',grade:1,type:'改錯字',q:'請找出錯字：\n「我門一起去公園玩。」',options:['我門 → 我們','一起 → 一起','公園 → 公元','玩 → 完'],answer:0,explain:'「我們」表示自己和其他人，應寫作「們」。'},
-  {subject:'國語',grade:1,type:'選正確形容詞',q:'請選出最適合的詞：\n「兔子的尾巴＿＿＿的。」',options:['短短','長長','大大','重重'],answer:0,explain:'兔子的尾巴短短的。'},
-  {subject:'國語',grade:1,type:'詞語理解',q:'「早上」通常是什麼時候？',options:['太陽剛出來的時候','吃晚餐以後','要睡覺的時候','半夜的時候'],answer:0,explain:'早上是一天開始、太陽剛出來前後的時間。'},
-  {subject:'國語',grade:1,type:'造句',q:'哪一句話正確使用了「正在」？',options:['妹妹正在寫功課。','正在妹妹一支筆。','書包正在桌上。','正在我喜歡吃飯。'],answer:0,explain:'「正在」表示一件事情此刻進行中。'},
-  {subject:'國語',grade:1,type:'拼字',q:'下面哪一個字的讀音是「ㄏㄨㄚ」？',options:['花','草','樹','葉'],answer:0,explain:'「花」讀作 ㄏㄨㄚ。'},
-  {subject:'國語',grade:1,type:'選正確詞語',q:'「小鳥在樹上＿＿＿。」',options:['唱歌','游泳','寫字','看書'],answer:0,explain:'小鳥會在樹上唱歌。'},
-  {subject:'國語',grade:1,type:'句子理解',q:'「媽媽把蛋糕切成四塊。」哪一個說法正確？',options:['蛋糕原本是一整個','媽媽吃了四個蛋糕','蛋糕變成一顆蛋','媽媽在畫蛋糕'],answer:0,explain:'「切成四塊」表示原本的一個蛋糕被分成四部分。'},
-  {subject:'國語',grade:1,type:'選正確形容詞',q:'請選出最適合的詞：\n「大象的耳朵＿＿＿的。」',options:['大大','小小','細細','短短'],answer:0,explain:'大象有大大的耳朵。'},
-  {subject:'國語',grade:1,type:'改錯字',q:'請找出錯字：\n「太陽從東邊生起來。」',options:['生 → 升','陽 → 楊','東 → 冬','邊 → 便'],answer:0,explain:'太陽從東邊「升」起來。'},
+const questionBank = [];
+function add(subject, grade, type, q, options, answer, explain) { questionBank.push({subject,grade,type,q,options,answer,explain}); }
 
-  {subject:'國語',grade:2,type:'改錯字',q:'請找出錯字並選出正確寫法：\n「小朋友排隊進入博物管。」',options:['朋 → 棚','隊 → 對','管 → 館','進 → 近'],answer:2,explain:'收藏、展示文物的地方叫「博物館」。'},
-  {subject:'國語',grade:2,type:'選正確形容詞',q:'請選出最適合的詞：\n「媽媽煮的湯＿＿＿的，大家都喜歡喝。」',options:['香香','硬硬','黑黑','尖尖'],answer:0,explain:'好喝的湯通常聞起來香香的。'},
-  {subject:'國語',grade:2,type:'造句',q:'哪一句正確使用了「先……再……」？',options:['我先洗手，再吃點心。','我先點心，再吃手。','先我洗手再。','洗手先再吃。'],answer:0,explain:'「先……再……」表示做事的先後順序。'},
-  {subject:'國語',grade:2,type:'詞語理解',q:'「安靜」的意思最接近哪一個？',options:['沒有吵鬧的聲音','跑得非常快','顏色很漂亮','東西很重'],answer:0,explain:'安靜表示沒有嘈雜的聲音。'},
-  {subject:'國語',grade:2,type:'拼字',q:'哪一個字和「說話」有關？',options:['語','跑','林','明'],answer:0,explain:'「語」和語言、說話有關。'},
-  {subject:'國語',grade:2,type:'選正確形容詞',q:'請選出最適合的詞：\n「爺爺的鬍子＿＿＿的。」',options:['白白','甜甜','亮亮','圓圓'],answer:0,explain:'爺爺的鬍子常可用「白白的」來形容。'},
-  {subject:'國語',grade:2,type:'改錯字',q:'請找出錯字：\n「今天的天氣真晴朗，適合郊由。」',options:['氣 → 汽','朗 → 狼','郊由 → 郊遊','合 → 和'],answer:2,explain:'到郊外遊玩叫作「郊遊」。'},
-  {subject:'國語',grade:2,type:'句子理解',q:'「小美把雨傘借給沒有帶傘的同學。」小美是一個怎樣的人？',options:['樂於幫助別人','喜歡生氣','不愛上學','很粗心'],answer:0,explain:'把雨傘借給同學，表示小美願意幫助別人。'},
-  {subject:'國語',grade:2,type:'造句',q:'哪一句正確使用了「因為……所以……」？',options:['因為下雨，所以我們帶雨傘。','因為我們帶雨傘，下雨所以。','下雨因為，所以帶雨傘。','所以因為雨傘下雨。'],answer:0,explain:'「因為……所以……」用來說明原因和結果。'},
-  {subject:'國語',grade:2,type:'選正確詞語',q:'「圖書館裡要＿＿＿說話。」',options:['小聲','大聲','快速','用力'],answer:0,explain:'圖書館需要保持安靜，要小聲說話。'},
-  {subject:'國語',grade:2,type:'拼字',q:'「認真」的「認」和哪個意思最有關？',options:['知道、承認','跑步、跳躍','唱歌、跳舞','吃飯、喝水'],answer:0,explain:'「認」有知道、辨認、承認的意思。'},
-  {subject:'國語',grade:2,type:'選正確形容詞',q:'請選出最適合的詞：\n「剛洗好的衣服＿＿＿的。」',options:['濕濕','乾乾','尖尖','酸酸'],answer:0,explain:'剛洗好的衣服還沒有曬乾，所以是濕濕的。'},
-  {subject:'國語',grade:2,type:'改錯字',q:'請找出錯字：\n「老師稱讚小偉很有里貌。」',options:['師 → 獅','讚 → 贊','里 → 禮','偉 → 緯'],answer:2,explain:'懂得禮節叫「有禮貌」。'},
-  {subject:'國語',grade:2,type:'句子排序',q:'請選出語意最通順的句子。',options:['弟弟認真地拼拼圖。','認真地弟弟拼拼圖。','拼圖弟弟地認真。','地拼圖認真弟弟。'],answer:0,explain:'主詞「弟弟」後接動作「認真地拼拼圖」，最通順。'},
-  {subject:'國語',grade:2,type:'造句',q:'哪一句正確使用了「終於」？',options:['我終於把作業寫完了。','終於我書包一個。','媽媽買終於菜。','終於小狗很可愛。'],answer:0,explain:'「終於」表示經過一段時間後，事情最後完成或發生。'},
-  {subject:'國語',grade:2,type:'詞語理解',q:'「仔細」最接近哪一個意思？',options:['用心、不馬虎','很快地跑','很大聲地說','很早睡覺'],answer:0,explain:'仔細表示做事用心、注意細節。'},
-  {subject:'國語',grade:2,type:'選正確詞語',q:'「放學後，我和同學到＿＿＿盪鞦韆。」',options:['公園','廚房','醫院','書店'],answer:0,explain:'盪鞦韆通常在公園的遊樂設施區。'},
-  {subject:'國語',grade:2,type:'改錯字',q:'請找出錯字：\n「弟弟感冒了，身體很虛弱。」',options:['弟 → 第','冒 → 帽','虛 → 須','這一句沒有錯字'],answer:3,explain:'「弟弟感冒了，身體很虛弱。」字都正確。'},
-  {subject:'國語',grade:2,type:'選正確形容詞',q:'請選出最適合的詞：\n「這條毛巾摸起來＿＿＿的。」',options:['柔軟','吵鬧','明亮','快速'],answer:0,explain:'毛巾摸起來可以用「柔軟」形容。'},
-  {subject:'國語',grade:2,type:'拼字',q:'「教室」的「室」最可能和哪一個字的意思相近？',options:['房','跑','笑','看'],answer:0,explain:'「室」有房間的意思。'},
-  {subject:'國語',grade:2,type:'選擇題',q:'「妹妹在公園裡跳舞，真快樂。」哪一個說法正確？',options:['句子沒有錯字','「園」要改成「元」','「舞」要改成「午」','「快樂」要改成「快了」'],answer:0,explain:'這一句的字都寫正確。'},
-  {subject:'國語',grade:2,type:'選正確形容詞',q:'請選出最適合的詞：\n「夜晚的天空＿＿＿的，還有許多星星。」',options:['黑黑','香香','酸酸','重重'],answer:0,explain:'夜晚的天空看起來黑黑的。'},
-  {subject:'國語',grade:2,type:'拼字',q:'「跑步」的「步」部首是什麼？',options:['止','足','走','口'],answer:0,explain:'「步」的部首是「止」。'},
-  {subject:'國語',grade:2,type:'造句',q:'哪一句話把「一邊……一邊……」用得最正確？',options:['我一邊聽音樂，一邊畫畫。','我一邊書包，一邊上學。','一邊小狗很可愛。','我一邊吃飯很香。'],answer:0,explain:'「一邊……一邊……」表示同時進行兩件事。'},
+// 國語一年級
+add('國語',1,'拼字','「太陽」的「陽」讀音最接近哪一個？',['洋','羊','樣','揚'],1,'「陽」和「羊」都讀 ㄧㄤˊ。');
+add('國語',1,'形容詞','請選出最適合的詞：\n「蘋果吃起來＿＿＿的。」',['甜甜','跑跑','看看','睡睡'],0,'「甜甜」可以形容蘋果的味道。');
+add('國語',1,'造句','哪一句話正確使用了「開心」？',['我今天得到禮物，覺得很開心。','開心在桌上寫字。','媽媽買開心回家。','小狗開心一碗飯。'],0,'「開心」用來形容快樂的心情。');
+add('國語',1,'形容詞','請選出最適合的詞：\n「白白的＿＿＿在天空飄。」',['雲朵','石頭','書包','鉛筆'],0,'白白的雲朵會在天空飄。');
+add('國語',1,'筆畫','「花朵」的「朵」有幾畫？',['5畫','6畫','7畫','8畫'],1,'「朵」共有 6 畫。');
+add('國語',1,'詞語','請選出可以放進句子的詞：\n「我每天＿＿＿去上學。」',['快快','高高','天天','早早'],3,'「早早去上學」語意最通順。');
+add('國語',1,'造句','哪一句正確使用了「一起」？',['我和弟弟一起看故事書。','一起書包在桌上。','媽媽一起買菜。','小鳥一起天空。'],0,'「一起」表示共同做一件事。');
+add('國語',1,'形容詞','請選出最適合的詞：\n「冰淇淋吃起來＿＿＿的。」',['冰冰','熱熱','長長','高高'],0,'冰淇淋的感覺是冰冰的。');
+add('國語',1,'拼字','下面哪一個字和「手」有關？',['打','唱','明','花'],0,'「打」要用手來做。');
+add('國語',1,'句子排序','請選出正確的句子。',['小狗在院子裡跑。','在小狗跑院子裡。','院子裡小狗在跑。','跑小狗在裡院子。'],0,'「小狗在院子裡跑。」語序完整又通順。');
+add('國語',1,'形容詞','請選出最適合的詞：\n「長頸鹿有＿＿＿的脖子。」',['長長','短短','小小','圓圓'],0,'長頸鹿的脖子長長的。');
+add('國語',1,'部首','「雨」是什麼部首？',['雨','水','天','日'],0,'「雨」本身就是一個部首。');
+add('國語',1,'造句','哪一句話正確使用了「喜歡」？',['我喜歡吃媽媽煮的飯。','喜歡在桌上一本書。','小狗喜歡很可愛。','媽媽買喜歡回家。'],0,'「喜歡」可以說明自己愛好的事物。');
+add('國語',1,'詞語','「爸爸在＿＿＿看報紙。」',['客廳','天空','書包','鉛筆'],0,'爸爸可以在客廳看報紙。');
+add('國語',1,'改錯字','請找出錯字：\n「我門一起去公園玩。」',['我門 → 我們','一起 → 一起','公園 → 公元','玩 → 完'],0,'「我們」表示自己和其他人，應寫作「們」。');
+add('國語',1,'形容詞','請選出最適合的詞：\n「兔子的尾巴＿＿＿的。」',['短短','長長','大大','重重'],0,'兔子的尾巴短短的。');
+add('國語',1,'詞語理解','「早上」通常是什麼時候？',['太陽剛出來的時候','吃晚餐以後','要睡覺的時候','半夜的時候'],0,'早上是一天開始、太陽剛出來前後的時間。');
+add('國語',1,'造句','哪一句話正確使用了「正在」？',['妹妹正在寫功課。','正在妹妹一支筆。','書包正在桌上。','正在我喜歡吃飯。'],0,'「正在」表示一件事情此刻進行中。');
+add('國語',1,'拼字','下面哪一個字的讀音是「ㄏㄨㄚ」？',['花','草','樹','葉'],0,'「花」讀作 ㄏㄨㄚ。');
+add('國語',1,'詞語','「小鳥在樹上＿＿＿。」',['唱歌','游泳','寫字','看書'],0,'小鳥會在樹上唱歌。');
+add('國語',1,'句子理解','「媽媽把蛋糕切成四塊。」哪一個說法正確？',['蛋糕原本是一整個','媽媽吃了四個蛋糕','蛋糕變成一顆蛋','媽媽在畫蛋糕'],0,'「切成四塊」表示原本的一個蛋糕被分成四部分。');
+add('國語',1,'形容詞','請選出最適合的詞：\n「大象的耳朵＿＿＿的。」',['大大','小小','細細','短短'],0,'大象有大大的耳朵。');
+add('國語',1,'改錯字','請找出錯字：\n「太陽從東邊生起來。」',['生 → 升','陽 → 楊','東 → 冬','邊 → 便'],0,'太陽從東邊「升」起來。');
 
-  {subject:'國語',grade:3,type:'選擇題',q:'下列句子哪一個沒有錯字？',options:['校園裡的花兒爭先恐後地開放。','校員裡的花兒爭先恐後地開放。','校園裡的花兒真先恐後地開放。','校園裡的花兒爭先空後地開放。'],answer:0,explain:'正確寫法是「校園裡的花兒爭先恐後地開放」。'},
-  {subject:'國語',grade:3,type:'選正確形容詞',q:'請選出最適合的詞：\n「經過整理後，房間看起來＿＿＿又舒適。」',options:['整潔','混亂','吵鬧','遙遠'],answer:0,explain:'整理過的房間應該是整潔的。'},
-  {subject:'國語',grade:3,type:'成語理解',q:'「一心一意」最接近哪個意思？',options:['專心做一件事','同時做很多事','不想做事情','到處玩耍'],answer:0,explain:'一心一意表示專心、沒有分心。'},
-  {subject:'國語',grade:3,type:'造句',q:'哪一句正確使用了「不但……而且……」？',options:['這本書不但有趣，而且內容豐富。','不但這本書，而且有趣。','內容不但豐富這本書。','而且不但書有趣。'],answer:0,explain:'「不但……而且……」用來補充更進一步的事實。'},
-  {subject:'國語',grade:3,type:'詞語理解',q:'「慚愧」最可能是什麼心情？',options:['因做錯事而不好意思','得到獎品很高興','看見朋友很驚訝','聽到笑話很開心'],answer:0,explain:'慚愧是因為做得不夠好或做錯事而感到不好意思。'},
-  {subject:'國語',grade:3,type:'改錯字',q:'請找出錯字：\n「我們要養成節約用水的好習貫。」',options:['養 → 仰','成 → 城','約 → 躍','貫 → 慣'],answer:3,explain:'經常做而形成的行為叫「習慣」。'},
-  {subject:'國語',grade:3,type:'選正確形容詞',q:'請選出最適合的詞：\n「早晨的空氣十分＿＿＿，令人精神飽滿。」',options:['清新','污濁','尖銳','苦澀'],answer:0,explain:'早晨的空氣可用「清新」形容。'},
-  {subject:'國語',grade:3,type:'句子理解',q:'「即使遇到困難，他仍然不放棄。」這句話主要在讚美他什麼？',options:['有毅力','很富有','跑得快','聲音大'],answer:0,explain:'遇到困難仍不放棄，表示有毅力。'},
-  {subject:'國語',grade:3,type:'造句',q:'哪一句正確使用了「除了……還……」？',options:['除了鉛筆，我還帶了橡皮擦。','除了我鉛筆還帶。','我還除了鉛筆。','鉛筆除了橡皮擦。'],answer:0,explain:'「除了……還……」表示在一項事物之外，另有其他事物。'},
-  {subject:'國語',grade:3,type:'詞語辨析',q:'下面哪一組詞語意思相反？',options:['高興／快樂','開始／結束','美麗／漂亮','安靜／寧靜'],answer:1,explain:'「開始」和「結束」意思相反。'},
-  {subject:'國語',grade:3,type:'改錯字',q:'請找出錯字：\n「比賽結束後，大家給選手熱烈的古掌。」',options:['賽 → 塞','選 → 先','烈 → 列','古 → 鼓'],answer:3,explain:'拍手叫作「鼓掌」。'},
-  {subject:'國語',grade:3,type:'選正確詞語',q:'「看到地上有垃圾，我主動把它＿＿＿起來。」',options:['撿','放','推','忘'],answer:0,explain:'看到垃圾應該主動撿起來。'},
-  {subject:'國語',grade:3,type:'成語理解',q:'「井井有條」適合形容什麼？',options:['事情安排得很有秩序','天空下著大雨','一個人非常傷心','食物味道很甜'],answer:0,explain:'井井有條表示有條理、有秩序。'},
-  {subject:'國語',grade:3,type:'造句',q:'哪一句正確使用了「如果……就……」？',options:['如果明天下雨，我們就改在室內活動。','如果明天，我們就下雨。','就如果活動室內。','我們如果就改。'],answer:0,explain:'「如果……就……」用來表達假設的條件與結果。'},
-  {subject:'國語',grade:3,type:'修辭辨識',q:'「月亮像一艘小船掛在天空。」這句話使用了哪一種寫法？',options:['譬喻','設問','誇飾','排比'],answer:0,explain:'用「像」把月亮比作小船，是譬喻。'},
-  {subject:'國語',grade:3,type:'選正確形容詞',q:'請選出最適合的詞：\n「小溪的水＿＿＿流過石頭。」',options:['緩緩地','大聲地','生氣地','尖銳地'],answer:0,explain:'溪水可以緩緩地流過石頭。'},
-  {subject:'國語',grade:3,type:'改錯字',q:'請找出錯字：\n「我們要保護大自燃，愛惜地球。」',options:['保 → 寶','護 → 戶','燃 → 然','惜 → 借'],answer:2,explain:'正確寫法是「大自然」。'},
-  {subject:'國語',grade:3,type:'段落理解',q:'「小志每天練習跑步，終於在運動會得到第一名。」主要原因是什麼？',options:['持續練習','運氣很好','沒有參加比賽','跑錯路'],answer:0,explain:'每天持續練習，是他得到好成績的重要原因。'},
-  {subject:'國語',grade:3,type:'選正確詞語',q:'「聽完老師的說明後，大家都＿＿＿地點點頭。」',options:['明白','遙遠','甜美','沉重'],answer:0,explain:'了解內容後會明白地點點頭。'},
-  {subject:'國語',grade:3,type:'詞語辨析',q:'「珍惜」最接近下面哪個意思？',options:['重視並好好愛護','隨便丟掉','忘記不管','快速離開'],answer:0,explain:'珍惜表示重視、好好愛護。'},
-  {subject:'國語',grade:3,type:'改錯字',q:'請找出錯字：\n「下課鐘聲想起，同學們高興地跑到操場。」',options:['鐘 → 中','想 → 響','興 → 幸','地 → 的'],answer:1,explain:'聲音發出時用「響起」，不是「想起」。'},
-  {subject:'國語',grade:3,type:'選正確形容詞',q:'請選出最適合的詞：\n「經過一夜大雨，河水變得＿＿＿。」',options:['清澈','混濁','安靜','柔軟'],answer:1,explain:'大雨會把泥沙沖進河裡，河水常會變得混濁。'},
-  {subject:'國語',grade:3,type:'詞語理解',q:'「觀察」的「察」最可能和哪個意思有關？',options:['仔細看','快速跑','大聲說','用力拿'],answer:0,explain:'觀察是仔細地看、留意事物。'},
-  {subject:'國語',grade:3,type:'造句',q:'哪一句話正確使用了「雖然……但是……」？',options:['雖然下雨，但是我們還是帶傘出門。','雖然我帶傘，雨很大。','但是下雨，雖然帶傘。','我雖然一個蘋果但是。'],answer:0,explain:'「雖然……但是……」用來表達前後有轉折關係。'},
+// 國語二年級
+add('國語',2,'改錯字','請找出錯字並選出正確寫法：\n「小朋友排隊進入博物管。」',['朋 → 棚','隊 → 對','管 → 館','進 → 近'],2,'收藏、展示文物的地方叫「博物館」。');
+add('國語',2,'形容詞','請選出最適合的詞：\n「媽媽煮的湯＿＿＿的，大家都喜歡喝。」',['香香','硬硬','黑黑','尖尖'],0,'好喝的湯通常聞起來香香的。');
+add('國語',2,'造句','哪一句正確使用了「先……再……」？',['我先洗手，再吃點心。','我先點心，再吃手。','先我洗手再。','洗手先再吃。'],0,'「先……再……」表示做事的先後順序。');
+add('國語',2,'詞語理解','「安靜」的意思最接近哪一個？',['沒有吵鬧的聲音','跑得非常快','顏色很漂亮','東西很重'],0,'安靜表示沒有嘈雜的聲音。');
+add('國語',2,'拼字','哪一個字和「說話」有關？',['語','跑','林','明'],0,'「語」和語言、說話有關。');
+add('國語',2,'形容詞','請選出最適合的詞：\n「爺爺的鬍子＿＿＿的。」',['白白','甜甜','亮亮','圓圓'],0,'爺爺的鬍子常可用「白白的」來形容。');
+add('國語',2,'改錯字','請找出錯字：\n「今天的天氣真晴朗，適合郊由。」',['氣 → 汽','朗 → 狼','郊由 → 郊遊','合 → 和'],2,'到郊外遊玩叫作「郊遊」。');
+add('國語',2,'句子理解','「小美把雨傘借給沒有帶傘的同學。」小美是一個怎樣的人？',['樂於幫助別人','喜歡生氣','不愛上學','很粗心'],0,'把雨傘借給同學，表示小美願意幫助別人。');
+add('國語',2,'造句','哪一句正確使用了「因為……所以……」？',['因為下雨，所以我們帶雨傘。','因為我們帶雨傘，下雨所以。','下雨因為，所以帶雨傘。','所以因為雨傘下雨。'],0,'「因為……所以……」用來說明原因和結果。');
+add('國語',2,'詞語','「圖書館裡要＿＿＿說話。」',['小聲','大聲','快速','用力'],0,'圖書館需要保持安靜，要小聲說話。');
+add('國語',2,'拼字','「認真」的「認」和哪個意思最有關？',['知道、承認','跑步、跳躍','唱歌、跳舞','吃飯、喝水'],0,'「認」有知道、辨認、承認的意思。');
+add('國語',2,'形容詞','請選出最適合的詞：\n「剛洗好的衣服＿＿＿的。」',['濕濕','乾乾','尖尖','酸酸'],0,'剛洗好的衣服還沒有曬乾，所以是濕濕的。');
+add('國語',2,'改錯字','請找出錯字：\n「老師稱讚小偉很有里貌。」',['師 → 獅','讚 → 贊','里 → 禮','偉 → 緯'],2,'懂得禮節叫「有禮貌」。');
+add('國語',2,'句子排序','請選出語意最通順的句子。',['弟弟認真地拼拼圖。','認真地弟弟拼拼圖。','拼圖弟弟地認真。','地拼圖認真弟弟。'],0,'主詞「弟弟」後接動作「認真地拼拼圖」，最通順。');
+add('國語',2,'造句','哪一句正確使用了「終於」？',['我終於把作業寫完了。','終於我書包一個。','媽媽買終於菜。','終於小狗很可愛。'],0,'「終於」表示經過一段時間後，事情最後完成或發生。');
+add('國語',2,'詞語理解','「仔細」最接近哪一個意思？',['用心、不馬虎','很快地跑','很大聲地說','很早睡覺'],0,'仔細表示做事用心、注意細節。');
+add('國語',2,'詞語','「放學後，我和同學到＿＿＿盪鞦韆。」',['公園','廚房','醫院','書店'],0,'盪鞦韆通常在公園的遊樂設施區。');
+add('國語',2,'選擇題','「弟弟感冒了，身體很虛弱。」哪一個說法正確？',['句子沒有錯字','「弟」要改成「第」','「冒」要改成「帽」','「虛」要改成「須」'],0,'這一句的字都正確。');
+add('國語',2,'形容詞','請選出最適合的詞：\n「這條毛巾摸起來＿＿＿的。」',['柔軟','吵鬧','明亮','快速'],0,'毛巾摸起來可以用「柔軟」形容。');
+add('國語',2,'拼字','「教室」的「室」最可能和哪一個字的意思相近？',['房','跑','笑','看'],0,'「室」有房間的意思。');
+add('國語',2,'選擇題','「妹妹在公園裡跳舞，真快樂。」哪一個說法正確？',['句子沒有錯字','「園」要改成「元」','「舞」要改成「午」','「快樂」要改成「快了」'],0,'這一句的字都寫正確。');
+add('國語',2,'形容詞','請選出最適合的詞：\n「夜晚的天空＿＿＿的，還有許多星星。」',['黑黑','香香','酸酸','重重'],0,'夜晚的天空看起來黑黑的。');
+add('國語',2,'部首','「跑步」的「步」部首是什麼？',['止','足','走','口'],0,'「步」的部首是「止」。');
+add('國語',2,'造句','哪一句話把「一邊……一邊……」用得最正確？',['我一邊聽音樂，一邊畫畫。','我一邊書包，一邊上學。','一邊小狗很可愛。','我一邊吃飯很香。'],0,'「一邊……一邊……」表示同時進行兩件事。');
 
-  {subject:'國語',grade:4,type:'改錯字',q:'請找出錯字並選出正確寫法：\n「這項發明改善了人們的生活品值。」',options:['項 → 向','發 → 髮','善 → 繕','值 → 質'],answer:3,explain:'生活的好壞程度稱為「生活品質」。'},
-  {subject:'國語',grade:4,type:'詞語理解',q:'「循序漸進」最接近哪個意思？',options:['按照步驟慢慢進步','一下子全部完成','不按順序亂做','停在原地不動'],answer:0,explain:'循序漸進是依照一定順序，逐步前進。'},
-  {subject:'國語',grade:4,type:'選正確形容詞',q:'請選出最適合的詞：\n「這位科學家做研究的態度非常＿＿＿。」',options:['嚴謹','馬虎','輕浮','混亂'],answer:0,explain:'科學研究需要仔細、周密的嚴謹態度。'},
-  {subject:'國語',grade:4,type:'造句',q:'哪一句正確使用了「即使……也……」？',options:['即使天氣很冷，他也每天晨跑。','即使每天晨跑，天氣也冷。','天氣即使也很冷。','他即使天氣也晨跑。'],answer:0,explain:'「即使……也……」表達讓步關係。'},
-  {subject:'國語',grade:4,type:'成語理解',q:'「畫蛇添足」要提醒我們什麼？',options:['做事不必多此一舉','畫畫一定要畫蛇','看到蛇要快跑','腳越多越好'],answer:0,explain:'畫蛇添足比喻做了多餘、不必要的事，反而壞事。'},
-  {subject:'國語',grade:4,type:'改錯字',q:'請找出錯字：\n「面對挫折時，我們應該保持樂觀的心太。」',options:['對 → 隊','折 → 哲','觀 → 關','太 → 態'],answer:3,explain:'心裡的狀態叫「心態」。'},
-  {subject:'國語',grade:4,type:'段落理解',q:'「為了減少塑膠垃圾，學校鼓勵學生自備水壺和環保餐具。」這段話的主旨是什麼？',options:['推動環保、減少垃圾','介紹新餐廳','鼓勵買更多塑膠品','說明水壺很重'],answer:0,explain:'自備用品的目的是減少一次性塑膠垃圾，推動環保。'},
-  {subject:'國語',grade:4,type:'選正確詞語',q:'「演講前，他反覆＿＿＿講稿，希望表現更好。」',options:['練習','遺忘','破壞','拒絕'],answer:0,explain:'演講前反覆練習講稿，能讓表現更好。'},
-  {subject:'國語',grade:4,type:'修辭辨識',q:'「風兒輕輕地唱著歌，吹過金黃的稻田。」這句話使用什麼修辭？',options:['擬人','譬喻','設問','對偶'],answer:0,explain:'風不會真的唱歌，作者把風當成人來寫，是擬人法。'},
-  {subject:'國語',grade:4,type:'造句',q:'哪一句正確使用了「由於……因此……」？',options:['由於颱風來襲，因此學校停課一天。','由於學校，因此颱風停課。','因此由於颱風來襲。','停課由於因此學校。'],answer:0,explain:'「由於……因此……」用來說明原因與結果。'},
-  {subject:'國語',grade:4,type:'詞語辨析',q:'「謙虛」的反義詞最可能是哪一個？',options:['驕傲','客氣','認真','安靜'],answer:0,explain:'謙虛是不自滿；驕傲、自滿是相反的態度。'},
-  {subject:'國語',grade:4,type:'選擇題',q:'「閱讀能夠增廣見聞，開拓視野。」哪一個說法正確？',options:['句子沒有錯字','「閱讀」應寫成「閱續」','「開拓」應寫成「開託」','「見聞」應寫成「見文」'],answer:0,explain:'「增廣見聞，開拓視野」字都正確。'},
-  {subject:'國語',grade:4,type:'成語理解',q:'「雪中送炭」最接近下面哪個意思？',options:['在別人急需時給予幫助','冬天送人去看雪','收到很多禮物','把木炭丟進雪裡'],answer:0,explain:'雪中送炭比喻在別人最需要時及時幫助。'},
-  {subject:'國語',grade:4,type:'選正確形容詞',q:'請選出最適合的詞：\n「博物館裡保存著＿＿＿的歷史文物。」',options:['珍貴','廉價','隨便','吵鬧'],answer:0,explain:'歷史文物具有保存與研究價值，可用「珍貴」形容。'},
-  {subject:'國語',grade:4,type:'段落理解',q:'「小安失敗後沒有責怪別人，而是檢討自己的方法，重新嘗試。」小安展現了哪一種態度？',options:['勇於反省、願意改進','逃避責任','自暴自棄','只會抱怨'],answer:0,explain:'檢討自己並重新嘗試，表示勇於反省和改進。'},
-  {subject:'國語',grade:4,type:'詞語理解',q:'「別出心裁」最接近哪個意思？',options:['想出與眾不同的新方法','跟著別人完全照做','忘記原本的事情','做事非常緩慢'],answer:0,explain:'別出心裁指想出獨特、新穎的構想。'},
-  {subject:'國語',grade:4,type:'造句',q:'哪一句正確使用了「儘管……仍然……」？',options:['儘管路途遙遠，我們仍然準時到達。','儘管我們仍然路途。','路途儘管到達仍然。','仍然遙遠儘管路途。'],answer:0,explain:'「儘管……仍然……」表示前後有讓步或轉折。'},
-  {subject:'國語',grade:4,type:'修辭辨識',q:'「書本是知識的寶庫。」這句話使用什麼修辭？',options:['譬喻','擬人','排比','誇飾'],answer:0,explain:'把書本比作寶庫，是譬喻法。'},
-  {subject:'國語',grade:4,type:'改錯字',q:'請找出錯字：\n「參加團體活動，可以培養合作精伸。」',options:['參 → 餐','培 → 賠','作 → 坐','伸 → 神'],answer:3,explain:'正確寫法是「合作精神」。'},
-  {subject:'國語',grade:4,type:'選正確詞語',q:'「面對複雜的問題，我們要＿＿＿思考，找出解決方法。」',options:['冷靜','衝動','馬虎','隨意'],answer:0,explain:'遇到問題時冷靜思考，較能找出合適的方法。'},
-  {subject:'國語',grade:4,type:'改錯字',q:'請找出錯字並選出正確寫法：\n「這本書的內容十分精采，令我愛不釋手。」',options:['容 → 榮','分 → 份','精采 → 精彩','釋 → 適'],answer:2,explain:'「精彩」通常寫作「精」「彩」。'},
-  {subject:'國語',grade:4,type:'選正確形容詞',q:'請選出最適合的詞：\n「登上山頂後，眼前的景色非常＿＿＿。」',options:['壯麗','狹小','吵鬧','苦澀'],answer:0,explain:'「壯麗」適合形容宏偉、美麗的自然景色。'},
-  {subject:'國語',grade:4,type:'詞語理解',q:'「迫不及待」最接近下面哪一個意思？',options:['急著想要立刻做','慢慢等待時機','不想參加活動','安靜休息一下'],answer:0,explain:'「迫不及待」形容心情急切，等不及要去做。'},
-  {subject:'國語',grade:4,type:'造句',q:'哪一句話正確使用了「不但……還……」？',options:['小芸不但會游泳，還會騎腳踏車。','不但小芸游泳，還。','小芸還不但去游泳。','不但會小芸，還游泳。'],answer:0,explain:'「不但……還……」用來補充更多同類的優點或事實。'},
+// 國語三年級
+add('國語',3,'選擇題','下列句子哪一個沒有錯字？',['校園裡的花兒爭先恐後地開放。','校員裡的花兒爭先恐後地開放。','校園裡的花兒真先恐後地開放。','校園裡的花兒爭先空後地開放。'],0,'正確寫法是「校園裡的花兒爭先恐後地開放」。');
+add('國語',3,'形容詞','請選出最適合的詞：\n「經過整理後，房間看起來＿＿＿又舒適。」',['整潔','混亂','吵鬧','遙遠'],0,'整理過的房間應該是整潔的。');
+add('國語',3,'成語','「一心一意」最接近哪個意思？',['專心做一件事','同時做很多事','不想做事情','到處玩耍'],0,'一心一意表示專心、沒有分心。');
+add('國語',3,'造句','哪一句正確使用了「不但……而且……」？',['這本書不但有趣，而且內容豐富。','不但這本書，而且有趣。','內容不但豐富這本書。','而且不但書有趣。'],0,'「不但……而且……」用來補充更進一步的事實。');
+add('國語',3,'詞語理解','「慚愧」最可能是什麼心情？',['因做錯事而不好意思','得到獎品很高興','看見朋友很驚訝','聽到笑話很開心'],0,'慚愧是因為做得不夠好或做錯事而感到不好意思。');
+add('國語',3,'改錯字','請找出錯字：\n「我們要養成節約用水的好習貫。」',['養 → 仰','成 → 城','約 → 躍','貫 → 慣'],3,'經常做而形成的行為叫「習慣」。');
+add('國語',3,'形容詞','請選出最適合的詞：\n「早晨的空氣十分＿＿＿，令人精神飽滿。」',['清新','污濁','尖銳','苦澀'],0,'早晨的空氣可用「清新」形容。');
+add('國語',3,'句子理解','「即使遇到困難，他仍然不放棄。」這句話主要在讚美他什麼？',['有毅力','很富有','跑得快','聲音大'],0,'遇到困難仍不放棄，表示有毅力。');
+add('國語',3,'造句','哪一句正確使用了「除了……還……」？',['除了鉛筆，我還帶了橡皮擦。','除了我鉛筆還帶。','我還除了鉛筆。','鉛筆除了橡皮擦。'],0,'「除了……還……」表示在一項事物之外，另有其他事物。');
+add('國語',3,'詞語辨析','下面哪一組詞語意思相反？',['高興／快樂','開始／結束','美麗／漂亮','安靜／寧靜'],1,'「開始」和「結束」意思相反。');
+add('國語',3,'改錯字','請找出錯字：\n「比賽結束後，大家給選手熱烈的古掌。」',['賽 → 塞','選 → 先','烈 → 列','古 → 鼓'],3,'拍手叫作「鼓掌」。');
+add('國語',3,'詞語','「看到地上有垃圾，我主動把它＿＿＿起來。」',['撿','放','推','忘'],0,'看到垃圾應該主動撿起來。');
+add('國語',3,'成語','「井井有條」適合形容什麼？',['事情安排得很有秩序','天空下著大雨','一個人非常傷心','食物味道很甜'],0,'井井有條表示有條理、有秩序。');
+add('國語',3,'造句','哪一句正確使用了「如果……就……」？',['如果明天下雨，我們就改在室內活動。','如果明天，我們就下雨。','就如果活動室內。','我們如果就改。'],0,'「如果……就……」用來表達假設的條件與結果。');
+add('國語',3,'修辭','「月亮像一艘小船掛在天空。」這句話使用了哪一種寫法？',['譬喻','設問','誇飾','排比'],0,'用「像」把月亮比作小船，是譬喻。');
+add('國語',3,'形容詞','請選出最適合的詞：\n「小溪的水＿＿＿流過石頭。」',['緩緩地','大聲地','生氣地','尖銳地'],0,'溪水可以緩緩地流過石頭。');
+add('國語',3,'改錯字','請找出錯字：\n「我們要保護大自燃，愛惜地球。」',['保 → 寶','護 → 戶','燃 → 然','惜 → 借'],2,'正確寫法是「大自然」。');
+add('國語',3,'段落理解','「小志每天練習跑步，終於在運動會得到第一名。」主要原因是什麼？',['持續練習','運氣很好','沒有參加比賽','跑錯路'],0,'每天持續練習，是他得到好成績的重要原因。');
+add('國語',3,'詞語','「聽完老師的說明後，大家都＿＿＿地點點頭。」',['明白','遙遠','甜美','沉重'],0,'了解內容後會明白地點點頭。');
+add('國語',3,'詞語辨析','「珍惜」最接近下面哪個意思？',['重視並好好愛護','隨便丟掉','忘記不管','快速離開'],0,'珍惜表示重視、好好愛護。');
+add('國語',3,'改錯字','請找出錯字：\n「下課鐘聲想起，同學們高興地跑到操場。」',['鐘 → 中','想 → 響','興 → 幸','地 → 的'],1,'聲音發出時用「響起」，不是「想起」。');
+add('國語',3,'形容詞','請選出最適合的詞：\n「經過一夜大雨，河水變得＿＿＿。」',['清澈','混濁','安靜','柔軟'],1,'大雨會把泥沙沖進河裡，河水常會變得混濁。');
+add('國語',3,'詞語理解','「觀察」的「察」最可能和哪個意思有關？',['仔細看','快速跑','大聲說','用力拿'],0,'觀察是仔細地看、留意事物。');
+add('國語',3,'造句','哪一句話正確使用了「雖然……但是……」？',['雖然下雨，但是我們還是帶傘出門。','雖然我帶傘，雨很大。','但是下雨，雖然帶傘。','我雖然一個蘋果但是。'],0,'「雖然……但是……」用來表達前後有轉折關係。');
 
-  {subject:'數學',grade:1,type:'選擇題',q:'7 + 5 = ?',options:['11','12','13','14'],answer:1,explain:'7 加 5 等於 12。'},
-  {subject:'數學',grade:1,type:'應用題',q:'小華有 9 顆糖，吃了 3 顆，還剩幾顆？',options:['5 顆','6 顆','7 顆','12 顆'],answer:1,explain:'9 − 3 = 6，所以剩下 6 顆。'},
-  {subject:'數學',grade:1,type:'選擇題',q:'哪一個數字最大？',options:['8','15','12','9'],answer:1,explain:'15 比 8、12、9 都大。'},
-  {subject:'數學',grade:1,type:'應用題',q:'桌上有 4 本書，又拿來 6 本，一共有幾本？',options:['2 本','10 本','11 本','12 本'],answer:1,explain:'4 + 6 = 10。'},
-  {subject:'數學',grade:1,type:'選擇題',q:'8 + 6 = ?',options:['12','13','14','15'],answer:2,explain:'8 + 6 = 14。'},
-  {subject:'數學',grade:1,type:'應用題',q:'小美有 15 張貼紙，送給朋友 4 張，還剩幾張？',options:['9 張','10 張','11 張','19 張'],answer:2,explain:'15 − 4 = 11，所以還剩 11 張。'},
-  {subject:'數學',grade:1,type:'選擇題',q:'10 + 9 = ?',options:['18','19','20','17'],answer:1,explain:'10 + 9 = 19。'},
-  {subject:'數學',grade:1,type:'應用題',q:'樹上原有 6 隻鳥，又飛來 7 隻，一共有幾隻鳥？',options:['12 隻','13 隻','14 隻','1 隻'],answer:1,explain:'6 + 7 = 13。'},
-  {subject:'數學',grade:1,type:'比較大小',q:'下面哪個符號正確？\n16 ＿＿ 12',options:['>','<','=','＋'],answer:0,explain:'16 比 12 大，所以要填入 >。'},
-  {subject:'數學',grade:1,type:'選擇題',q:'20 − 8 = ?',options:['10','11','12','13'],answer:2,explain:'20 − 8 = 12。'},
-  {subject:'數學',grade:1,type:'應用題',q:'鉛筆盒裡有 5 枝鉛筆，又放進 8 枝，現在有幾枝？',options:['3 枝','12 枝','13 枝','14 枝'],answer:2,explain:'5 + 8 = 13。'},
-  {subject:'數學',grade:1,type:'圖形',q:'下面哪一個圖形有 3 條邊？',options:['三角形','正方形','長方形','圓形'],answer:0,explain:'三角形有 3 條邊。'},
-  {subject:'數學',grade:1,type:'選擇題',q:'數字 47 裡面，有幾個十？',options:['3 個十','4 個十','7 個十','47 個十'],answer:1,explain:'47 = 4 個十和 7 個一。'},
-  {subject:'數學',grade:1,type:'應用題',q:'媽媽買了 18 個橘子，吃掉 6 個，還有幾個？',options:['10 個','11 個','12 個','24 個'],answer:2,explain:'18 − 6 = 12。'},
-  {subject:'數學',grade:1,type:'選擇題',q:'哪一個數字最接近 30？',options:['18','29','45','12'],answer:1,explain:'29 和 30 相差 1，最接近 30。'},
-  {subject:'數學',grade:1,type:'時間',q:'短針指向 7，長針指向 12，是幾點？',options:['7 點','12 點','6 點','7 點半'],answer:0,explain:'長針在 12 表示整點，短針在 7，所以是 7 點。'},
-  {subject:'數學',grade:1,type:'選擇題',q:'14 − 9 = ?',options:['4','5','6','23'],answer:1,explain:'14 − 9 = 5。'},
-  {subject:'數學',grade:1,type:'應用題',q:'教室裡有 11 個男生和 9 個女生，一共有幾個學生？',options:['18 人','19 人','20 人','21 人'],answer:2,explain:'11 + 9 = 20。'},
-  {subject:'數學',grade:1,type:'比較大小',q:'下面哪一個數字最小？',options:['25','19','31','22'],answer:1,explain:'19 比 25、31、22 都小。'},
-  {subject:'數學',grade:1,type:'選擇題',q:'6 + 6 + 6 = ?',options:['12','16','18','20'],answer:2,explain:'6 + 6 + 6 = 18。'},
-  {subject:'數學',grade:1,type:'應用題',q:'小志有 13 元，買橡皮擦花了 5 元，剩下幾元？',options:['7 元','8 元','9 元','18 元'],answer:1,explain:'13 − 5 = 8。'},
-  {subject:'數學',grade:1,type:'圖形',q:'下面哪一個圖形沒有角？',options:['三角形','正方形','圓形','長方形'],answer:2,explain:'圓形沒有角。'},
-  {subject:'數學',grade:1,type:'數序',q:'請選出正確的數字順序：18、19、＿＿、21',options:['17','20','22','30'],answer:1,explain:'18、19 之後是 20，再來是 21。'},
-  {subject:'數學',grade:1,type:'應用題',q:'有 16 顆球，紅色的有 7 顆，其他是藍色，藍色有幾顆？',options:['8 顆','9 顆','10 顆','23 顆'],answer:1,explain:'16 − 7 = 9。'},
+// 國語四年級
+add('國語',4,'改錯字','請找出錯字並選出正確寫法：\n「這項發明改善了人們的生活品值。」',['項 → 向','發 → 髮','善 → 繕','值 → 質'],3,'生活的好壞程度稱為「生活品質」。');
+add('國語',4,'成語','「循序漸進」最接近哪個意思？',['按照步驟慢慢進步','一下子全部完成','不按順序亂做','停在原地不動'],0,'循序漸進是依照一定順序，逐步前進。');
+add('國語',4,'形容詞','請選出最適合的詞：\n「這位科學家做研究的態度非常＿＿＿。」',['嚴謹','馬虎','輕浮','混亂'],0,'科學研究需要仔細、周密的嚴謹態度。');
+add('國語',4,'造句','哪一句正確使用了「即使……也……」？',['即使天氣很冷，他也每天晨跑。','即使每天晨跑，天氣也冷。','天氣即使也很冷。','他即使天氣也晨跑。'],0,'「即使……也……」表達讓步關係。');
+add('國語',4,'成語','「畫蛇添足」要提醒我們什麼？',['做事不必多此一舉','畫畫一定要畫蛇','看到蛇要快跑','腳越多越好'],0,'畫蛇添足比喻做了多餘、不必要的事，反而壞事。');
+add('國語',4,'改錯字','請找出錯字：\n「面對挫折時，我們應該保持樂觀的心太。」',['對 → 隊','折 → 哲','觀 → 關','太 → 態'],3,'心裡的狀態叫「心態」。');
+add('國語',4,'段落理解','「為了減少塑膠垃圾，學校鼓勵學生自備水壺和環保餐具。」這段話的主旨是什麼？',['推動環保、減少垃圾','介紹新餐廳','鼓勵買更多塑膠品','說明水壺很重'],0,'自備用品的目的是減少一次性塑膠垃圾，推動環保。');
+add('國語',4,'詞語','「演講前，他反覆＿＿＿講稿，希望表現更好。」',['練習','遺忘','破壞','拒絕'],0,'演講前反覆練習講稿，能讓表現更好。');
+add('國語',4,'修辭','「風兒輕輕地唱著歌，吹過金黃的稻田。」這句話使用什麼修辭？',['擬人','譬喻','設問','對偶'],0,'風不會真的唱歌，作者把風當成人來寫，是擬人法。');
+add('國語',4,'造句','哪一句正確使用了「由於……因此……」？',['由於颱風來襲，因此學校停課一天。','由於學校，因此颱風停課。','因此由於颱風來襲。','停課由於因此學校。'],0,'「由於……因此……」用來說明原因與結果。');
+add('國語',4,'詞語辨析','「謙虛」的反義詞最可能是哪一個？',['驕傲','客氣','認真','安靜'],0,'謙虛是不自滿；驕傲、自滿是相反的態度。');
+add('國語',4,'選擇題','「閱讀能夠增廣見聞，開拓視野。」哪一個說法正確？',['句子沒有錯字','「閱讀」應寫成「閱續」','「開拓」應寫成「開託」','「見聞」應寫成「見文」'],0,'「增廣見聞，開拓視野」字都正確。');
+add('國語',4,'成語','「雪中送炭」最接近下面哪個意思？',['在別人急需時給予幫助','冬天送人去看雪','收到很多禮物','把木炭丟進雪裡'],0,'雪中送炭比喻在別人最需要時及時幫助。');
+add('國語',4,'形容詞','請選出最適合的詞：\n「博物館裡保存著＿＿＿的歷史文物。」',['珍貴','廉價','隨便','吵鬧'],0,'歷史文物具有保存與研究價值，可用「珍貴」形容。');
+add('國語',4,'段落理解','「小安失敗後沒有責怪別人，而是檢討自己的方法，重新嘗試。」小安展現了哪一種態度？',['勇於反省、願意改進','逃避責任','自暴自棄','只會抱怨'],0,'檢討自己並重新嘗試，表示勇於反省和改進。');
+add('國語',4,'詞語理解','「別出心裁」最接近哪個意思？',['想出與眾不同的新方法','跟著別人完全照做','忘記原本的事情','做事非常緩慢'],0,'別出心裁指想出獨特、新穎的構想。');
+add('國語',4,'造句','哪一句正確使用了「儘管……仍然……」？',['儘管路途遙遠，我們仍然準時到達。','儘管我們仍然路途。','路途儘管到達仍然。','仍然遙遠儘管路途。'],0,'「儘管……仍然……」表示前後有讓步或轉折。');
+add('國語',4,'修辭','「書本是知識的寶庫。」這句話使用什麼修辭？',['譬喻','擬人','排比','誇飾'],0,'把書本比作寶庫，是譬喻法。');
+add('國語',4,'改錯字','請找出錯字：\n「參加團體活動，可以培養合作精伸。」',['參 → 餐','培 → 賠','作 → 坐','伸 → 神'],3,'正確寫法是「合作精神」。');
+add('國語',4,'詞語','「面對複雜的問題，我們要＿＿＿思考，找出解決方法。」',['冷靜','衝動','馬虎','隨意'],0,'遇到問題時冷靜思考，較能找出合適的方法。');
+add('國語',4,'改錯字','請找出錯字並選出正確寫法：\n「這本書的內容十分精采，令我愛不釋手。」',['容 → 榮','分 → 份','精采 → 精彩','釋 → 適'],2,'「精彩」通常寫作「精」「彩」。');
+add('國語',4,'形容詞','請選出最適合的詞：\n「登上山頂後，眼前的景色非常＿＿＿。」',['壯麗','狹小','吵鬧','苦澀'],0,'「壯麗」適合形容宏偉、美麗的自然景色。');
+add('國語',4,'詞語理解','「迫不及待」最接近下面哪一個意思？',['急著想要立刻做','慢慢等待時機','不想參加活動','安靜休息一下'],0,'「迫不及待」形容心情急切，等不及要去做。');
+add('國語',4,'造句','哪一句話正確使用了「不但……還……」？',['小芸不但會游泳，還會騎腳踏車。','不但小芸游泳，還。','小芸還不但去游泳。','不但會小芸，還游泳。'],0,'「不但……還……」用來補充更多同類的優點或事實。');
 
-  {subject:'數學',grade:2,type:'選擇題',q:'34 + 28 = ?',options:['52','62','72','64'],answer:1,explain:'34 + 20 = 54，54 + 8 = 62。'},
-  {subject:'數學',grade:2,type:'應用題',q:'一盒彩色筆有 12 支，老師買了 3 盒，共有幾支？',options:['15 支','24 支','36 支','48 支'],answer:2,explain:'12 × 3 = 36。'},
-  {subject:'數學',grade:2,type:'選擇題',q:'63 − 27 = ?',options:['36','46','40','34'],answer:0,explain:'63 − 20 = 43，43 − 7 = 36。'},
-  {subject:'數學',grade:2,type:'應用題',q:'24 個餅乾平均分給 4 個小朋友，每人有幾個？',options:['5 個','6 個','7 個','8 個'],answer:1,explain:'24 ÷ 4 = 6。'},
-  {subject:'數學',grade:2,type:'選擇題',q:'47 + 35 = ?',options:['72','82','92','81'],answer:1,explain:'47 + 30 = 77，77 + 5 = 82。'},
-  {subject:'數學',grade:2,type:'應用題',q:'一包餅乾有 8 片，買了 5 包，共有幾片？',options:['13 片','30 片','40 片','45 片'],answer:2,explain:'8 × 5 = 40。'},
-  {subject:'數學',grade:2,type:'選擇題',q:'90 − 46 = ?',options:['44','54','34','46'],answer:0,explain:'90 − 40 = 50，50 − 6 = 44。'},
-  {subject:'數學',grade:2,type:'應用題',q:'36 支鉛筆平均分成 6 束，每束有幾支？',options:['5 支','6 支','7 支','8 支'],answer:1,explain:'36 ÷ 6 = 6。'},
-  {subject:'數學',grade:2,type:'乘法',q:'9 × 4 = ?',options:['32','35','36','40'],answer:2,explain:'9 × 4 = 36。'},
-  {subject:'數學',grade:2,type:'應用題',q:'一張桌子坐 4 人，7 張桌子最多可坐幾人？',options:['11 人','21 人','28 人','32 人'],answer:2,explain:'4 × 7 = 28。'},
-  {subject:'數學',grade:2,type:'選擇題',q:'56 ÷ 7 = ?',options:['6','7','8','9'],answer:2,explain:'7 × 8 = 56。'},
-  {subject:'數學',grade:2,type:'時間',q:'下午 3 點 30 分，再過 20 分鐘是幾點？',options:['下午 3 點 40 分','下午 3 點 50 分','下午 4 點','下午 4 點 20 分'],answer:1,explain:'3 點 30 分加 20 分鐘是 3 點 50 分。'},
-  {subject:'數學',grade:2,type:'長度',q:'1 公尺等於幾公分？',options:['10 公分','50 公分','100 公分','1000 公分'],answer:2,explain:'1 公尺 = 100 公分。'},
-  {subject:'數學',grade:2,type:'應用題',q:'阿姨有 50 元，買麵包花了 27 元，找回幾元？',options:['13 元','23 元','27 元','77 元'],answer:1,explain:'50 − 27 = 23。'},
-  {subject:'數學',grade:2,type:'選擇題',q:'哪一個算式的答案是 42？',options:['6 × 6','7 × 6','8 × 6','9 × 6'],answer:1,explain:'7 × 6 = 42。'},
-  {subject:'數學',grade:2,type:'應用題',q:'48 顆糖果，每 8 顆裝一包，可以裝成幾包？',options:['5 包','6 包','7 包','8 包'],answer:1,explain:'48 ÷ 8 = 6。'},
-  {subject:'數學',grade:2,type:'選擇題',q:'75 − 38 = ?',options:['37','47','43','33'],answer:0,explain:'75 − 30 = 45，45 − 8 = 37。'},
-  {subject:'數學',grade:2,type:'應用題',q:'農場有 6 排番茄，每排 9 棵，共有幾棵番茄？',options:['15 棵','45 棵','54 棵','63 棵'],answer:2,explain:'6 × 9 = 54。'},
-  {subject:'數學',grade:2,type:'重量',q:'下列哪一個最適合用「公斤」當單位？',options:['一顆葡萄的重量','一隻大西瓜的重量','一張紙的重量','一粒米的重量'],answer:1,explain:'大西瓜較重，適合用公斤表示。'},
-  {subject:'數學',grade:2,type:'選擇題',q:'64 ÷ 8 = ?',options:['7','8','9','10'],answer:1,explain:'8 × 8 = 64。'},
-  {subject:'數學',grade:2,type:'應用題',q:'書架上有 25 本故事書，又放上 18 本，現在有幾本？',options:['33 本','43 本','53 本','7 本'],answer:1,explain:'25 + 18 = 43。'},
-  {subject:'數學',grade:2,type:'錢幣',q:'買一枝筆要 18 元，拿 20 元付款，要找幾元？',options:['1 元','2 元','3 元','38 元'],answer:1,explain:'20 − 18 = 2。'},
-  {subject:'數學',grade:2,type:'選擇題',q:'7 × 7 = ?',options:['42','48','49','56'],answer:2,explain:'7 × 7 = 49。'},
-  {subject:'數學',grade:2,type:'應用題',q:'32 位學生要分成 4 組，每組有幾位？',options:['6 位','7 位','8 位','9 位'],answer:2,explain:'32 ÷ 4 = 8。'},
+// 數學一年級
+add('數學',1,'選擇題','7 + 5 = ?',['11','12','13','14'],1,'7 加 5 等於 12。');
+add('數學',1,'應用題','小華有 9 顆糖，吃了 3 顆，還剩幾顆？',['5 顆','6 顆','7 顆','12 顆'],1,'9 − 3 = 6，所以剩下 6 顆。');
+add('數學',1,'選擇題','哪一個數字最大？',['8','15','12','9'],1,'15 比 8、12、9 都大。');
+add('數學',1,'應用題','桌上有 4 本書，又拿來 6 本，一共有幾本？',['2 本','10 本','11 本','12 本'],1,'4 + 6 = 10。');
+add('數學',1,'選擇題','8 + 6 = ?',['12','13','14','15'],2,'8 + 6 = 14。');
+add('數學',1,'應用題','小美有 15 張貼紙，送給朋友 4 張，還剩幾張？',['9 張','10 張','11 張','19 張'],2,'15 − 4 = 11，所以還剩 11 張。');
+add('數學',1,'選擇題','10 + 9 = ?',['18','19','20','17'],1,'10 + 9 = 19。');
+add('數學',1,'應用題','樹上原有 6 隻鳥，又飛來 7 隻，一共有幾隻鳥？',['12 隻','13 隻','14 隻','1 隻'],1,'6 + 7 = 13。');
+add('數學',1,'比較大小','下面哪個符號正確？\n16 ＿＿ 12',['>','<','=','＋'],0,'16 比 12 大，所以要填入 >。');
+add('數學',1,'選擇題','20 − 8 = ?',['10','11','12','13'],2,'20 − 8 = 12。');
+add('數學',1,'應用題','鉛筆盒裡有 5 枝鉛筆，又放進 8 枝，現在有幾枝？',['3 枝','12 枝','13 枝','14 枝'],2,'5 + 8 = 13。');
+add('數學',1,'圖形','下面哪一個圖形有 3 條邊？',['三角形','正方形','長方形','圓形'],0,'三角形有 3 條邊。');
+add('數學',1,'選擇題','數字 47 裡面，有幾個十？',['3 個十','4 個十','7 個十','47 個十'],1,'47 = 4 個十和 7 個一。');
+add('數學',1,'應用題','媽媽買了 18 個橘子，吃掉 6 個，還有幾個？',['10 個','11 個','12 個','24 個'],2,'18 − 6 = 12。');
+add('數學',1,'選擇題','哪一個數字最接近 30？',['18','29','45','12'],1,'29 和 30 相差 1，最接近 30。');
+add('數學',1,'時間','短針指向 7，長針指向 12，是幾點？',['7 點','12 點','6 點','7 點半'],0,'長針在 12 表示整點，短針在 7，所以是 7 點。');
+add('數學',1,'選擇題','14 − 9 = ?',['4','5','6','23'],1,'14 − 9 = 5。');
+add('數學',1,'應用題','教室裡有 11 個男生和 9 個女生，一共有幾個學生？',['18 人','19 人','20 人','21 人'],2,'11 + 9 = 20。');
+add('數學',1,'比較大小','下面哪一個數字最小？',['25','19','31','22'],1,'19 比 25、31、22 都小。');
+add('數學',1,'選擇題','6 + 6 + 6 = ?',['12','16','18','20'],2,'6 + 6 + 6 = 18。');
+add('數學',1,'應用題','小志有 13 元，買橡皮擦花了 5 元，剩下幾元？',['7 元','8 元','9 元','18 元'],1,'13 − 5 = 8。');
+add('數學',1,'圖形','下面哪一個圖形沒有角？',['三角形','正方形','圓形','長方形'],2,'圓形沒有角。');
+add('數學',1,'數序','請選出正確的數字順序：18、19、＿＿、21',['17','20','22','30'],1,'18、19 之後是 20，再來是 21。');
+add('數學',1,'應用題','有 16 顆球，紅色的有 7 顆，其他是藍色，藍色有幾顆？',['8 顆','9 顆','10 顆','23 顆'],1,'16 − 7 = 9。');
 
-  {subject:'數學',grade:3,type:'選擇題',q:'7 × 8 = ?',options:['54','56','63','48'],answer:1,explain:'7 × 8 = 56。'},
-  {subject:'數學',grade:3,type:'應用題',q:'一張票 35 元，買 4 張票要多少元？',options:['120 元','130 元','140 元','150 元'],answer:2,explain:'35 × 4 = 140。'},
-  {subject:'數學',grade:3,type:'選擇題',q:'96 ÷ 8 = ?',options:['10','11','12','13'],answer:2,explain:'8 × 12 = 96。'},
-  {subject:'數學',grade:3,type:'應用題',q:'繩子長 3 公尺 25 公分，另一條長 2 公尺 40 公分，合起來長多少？',options:['5 公尺 55 公分','5 公尺 65 公分','6 公尺 5 公分','4 公尺 65 公分'],answer:1,explain:'3 公尺 25 公分 + 2 公尺 40 公分 = 5 公尺 65 公分。'},
-  {subject:'數學',grade:3,type:'選擇題',q:'246 + 135 = ?',options:['371','381','391','361'],answer:1,explain:'246 + 135 = 381。'},
-  {subject:'數學',grade:3,type:'應用題',q:'一箱飲料有 24 瓶，超商進了 6 箱，共有幾瓶？',options:['120 瓶','144 瓶','150 瓶','164 瓶'],answer:1,explain:'24 × 6 = 144。'},
-  {subject:'數學',grade:3,type:'選擇題',q:'503 − 278 = ?',options:['225','235','215','325'],answer:0,explain:'503 − 278 = 225。'},
-  {subject:'數學',grade:3,type:'應用題',q:'老師把 72 張色紙平均分給 9 組，每組有幾張？',options:['7 張','8 張','9 張','10 張'],answer:1,explain:'72 ÷ 9 = 8。'},
-  {subject:'數學',grade:3,type:'分數',q:'把一個披薩平均分成 4 份，吃了其中 1 份，吃了幾分之幾？',options:['四分之一','四分之二','一分之四','二分之一'],answer:0,explain:'平均分成 4 份，吃 1 份是四分之一。'},
-  {subject:'數學',grade:3,type:'選擇題',q:'36 × 3 = ?',options:['98','108','118','128'],answer:1,explain:'36 × 3 = 108。'},
-  {subject:'數學',grade:3,type:'應用題',q:'一條緞帶長 5 公尺，剪下 175 公分後，還剩多少公分？',options:['225 公分','275 公分','325 公分','425 公分'],answer:2,explain:'5 公尺 = 500 公分，500 − 175 = 325 公分。'},
-  {subject:'數學',grade:3,type:'時間',q:'上午 9 點 45 分到上午 11 點 15 分，經過多久？',options:['1 小時 20 分','1 小時 30 分','1 小時 40 分','2 小時 30 分'],answer:1,explain:'9:45 到 10:45 是 1 小時，再到 11:15 是 30 分，共 1 小時 30 分。'},
-  {subject:'數學',grade:3,type:'選擇題',q:'84 ÷ 4 = ?',options:['19','20','21','22'],answer:2,explain:'84 ÷ 4 = 21。'},
-  {subject:'數學',grade:3,type:'應用題',q:'每張郵票 5 元，買 18 張要多少元？',options:['80 元','85 元','90 元','95 元'],answer:2,explain:'5 × 18 = 90。'},
-  {subject:'數學',grade:3,type:'圖形',q:'正方形有幾條一樣長的邊？',options:['2 條','3 條','4 條','5 條'],answer:2,explain:'正方形的 4 條邊都一樣長。'},
-  {subject:'數學',grade:3,type:'選擇題',q:'125 × 4 = ?',options:['400','450','500','550'],answer:2,explain:'125 × 4 = 500。'},
-  {subject:'數學',grade:3,type:'應用題',q:'小威有 100 元，買文具花了 68 元，剩下的錢再買 4 枝一樣的筆，每枝筆多少元？',options:['6 元','7 元','8 元','9 元'],answer:2,explain:'100 − 68 = 32，32 ÷ 4 = 8。'},
-  {subject:'數學',grade:3,type:'分數',q:'哪一個分數比二分之一大？',options:['四分之一','三分之一','四分之三','五分之一'],answer:2,explain:'四分之三大於二分之一。'},
-  {subject:'數學',grade:3,type:'選擇題',q:'700 − 356 = ?',options:['334','344','354','364'],answer:1,explain:'700 − 356 = 344。'},
-  {subject:'數學',grade:3,type:'應用題',q:'農夫採了 96 顆芒果，每 12 顆裝一箱，可以裝幾箱？',options:['6 箱','7 箱','8 箱','9 箱'],answer:2,explain:'96 ÷ 12 = 8。'},
-  {subject:'數學',grade:3,type:'重量',q:'3 公斤 500 公克加上 2 公斤，一共是多少？',options:['4 公斤 500 公克','5 公斤','5 公斤 500 公克','6 公斤 500 公克'],answer:2,explain:'3 公斤 500 公克 + 2 公斤 = 5 公斤 500 公克。'},
-  {subject:'數學',grade:3,type:'選擇題',q:'48 ÷ 6 + 7 = ?',options:['13','14','15','16'],answer:2,explain:'48 ÷ 6 = 8，8 + 7 = 15。'},
-  {subject:'數學',grade:3,type:'應用題',q:'一本故事書有 120 頁，小芳每天看 15 頁，看完需要幾天？',options:['6 天','7 天','8 天','9 天'],answer:2,explain:'120 ÷ 15 = 8。'},
-  {subject:'數學',grade:3,type:'數線',q:'在數線上，450 的下一個整百數是？',options:['400','450','500','550'],answer:2,explain:'450 往上到下一個整百數是 500。'},
+// 數學二年級
+add('數學',2,'選擇題','34 + 28 = ?',['52','62','72','64'],1,'34 + 20 = 54，54 + 8 = 62。');
+add('數學',2,'應用題','一盒彩色筆有 12 支，老師買了 3 盒，共有幾支？',['15 支','24 支','36 支','48 支'],2,'12 × 3 = 36。');
+add('數學',2,'選擇題','63 − 27 = ?',['36','46','40','34'],0,'63 − 20 = 43，43 − 7 = 36。');
+add('數學',2,'應用題','24 個餅乾平均分給 4 個小朋友，每人有幾個？',['5 個','6 個','7 個','8 個'],1,'24 ÷ 4 = 6。');
+add('數學',2,'選擇題','47 + 35 = ?',['72','82','92','81'],1,'47 + 30 = 77，77 + 5 = 82。');
+add('數學',2,'應用題','一包餅乾有 8 片，買了 5 包，共有幾片？',['13 片','30 片','40 片','45 片'],2,'8 × 5 = 40。');
+add('數學',2,'選擇題','90 − 46 = ?',['44','54','34','46'],0,'90 − 40 = 50，50 − 6 = 44。');
+add('數學',2,'應用題','36 支鉛筆平均分成 6 束，每束有幾支？',['5 支','6 支','7 支','8 支'],1,'36 ÷ 6 = 6。');
+add('數學',2,'乘法','9 × 4 = ?',['32','35','36','40'],2,'9 × 4 = 36。');
+add('數學',2,'應用題','一張桌子坐 4 人，7 張桌子最多可坐幾人？',['11 人','21 人','28 人','32 人'],2,'4 × 7 = 28。');
+add('數學',2,'選擇題','56 ÷ 7 = ?',['6','7','8','9'],2,'7 × 8 = 56。');
+add('數學',2,'時間','下午 3 點 30 分，再過 20 分鐘是幾點？',['下午 3 點 40 分','下午 3 點 50 分','下午 4 點','下午 4 點 20 分'],1,'3 點 30 分加 20 分鐘是 3 點 50 分。');
+add('數學',2,'長度','1 公尺等於幾公分？',['10 公分','50 公分','100 公分','1000 公分'],2,'1 公尺 = 100 公分。');
+add('數學',2,'應用題','阿姨有 50 元，買麵包花了 27 元，找回幾元？',['13 元','23 元','27 元','77 元'],1,'50 − 27 = 23。');
+add('數學',2,'選擇題','哪一個算式的答案是 42？',['6 × 6','7 × 6','8 × 6','9 × 6'],1,'7 × 6 = 42。');
+add('數學',2,'應用題','48 顆糖果，每 8 顆裝一包，可以裝成幾包？',['5 包','6 包','7 包','8 包'],1,'48 ÷ 8 = 6。');
+add('數學',2,'選擇題','75 − 38 = ?',['37','47','43','33'],0,'75 − 30 = 45，45 − 8 = 37。');
+add('數學',2,'應用題','農場有 6 排番茄，每排 9 棵，共有幾棵番茄？',['15 棵','45 棵','54 棵','63 棵'],2,'6 × 9 = 54。');
+add('數學',2,'重量','下列哪一個最適合用「公斤」當單位？',['一顆葡萄的重量','一隻大西瓜的重量','一張紙的重量','一粒米的重量'],1,'大西瓜較重，適合用公斤表示。');
+add('數學',2,'選擇題','64 ÷ 8 = ?',['7','8','9','10'],1,'8 × 8 = 64。');
+add('數學',2,'應用題','書架上有 25 本故事書，又放上 18 本，現在有幾本？',['33 本','43 本','53 本','7 本'],1,'25 + 18 = 43。');
+add('數學',2,'錢幣','買一枝筆要 18 元，拿 20 元付款，要找幾元？',['1 元','2 元','3 元','38 元'],1,'20 − 18 = 2。');
+add('數學',2,'選擇題','7 × 7 = ?',['42','48','49','56'],2,'7 × 7 = 49。');
+add('數學',2,'應用題','32 位學生要分成 4 組，每組有幾位？',['6 位','7 位','8 位','9 位'],2,'32 ÷ 4 = 8。');
 
-  {subject:'數學',grade:4,type:'選擇題',q:'125 × 6 = ?',options:['650','700','750','800'],answer:2,explain:'100×6=600，20×6=120，5×6=30，共 750。'},
-  {subject:'數學',grade:4,type:'應用題',q:'一個長方形長 12 公分、寬 7 公分，它的周長是多少公分？',options:['19 公分','38 公分','84 公分','24 公分'],answer:1,explain:'周長 = (12 + 7) × 2 = 38 公分。'},
-  {subject:'數學',grade:4,type:'選擇題',q:'3.75 + 2.4 = ?',options:['5.15','6.15','6.25','5.25'],answer:1,explain:'2.4 可以寫成 2.40，所以 3.75 + 2.40 = 6.15。'},
-  {subject:'數學',grade:4,type:'應用題',q:'一瓶果汁有 1.5 公升，買 3 瓶共有幾公升？',options:['3.5 公升','4 公升','4.5 公升','5 公升'],answer:2,explain:'1.5 × 3 = 4.5 公升。'},
-  {subject:'數學',grade:4,type:'選擇題',q:'325 × 4 = ?',options:['1200','1300','1400','1500'],answer:1,explain:'325 × 4 = 1300。'},
-  {subject:'數學',grade:4,type:'應用題',q:'一個長方形花圃長 15 公尺、寬 8 公尺，面積是多少平方公尺？',options:['23 平方公尺','46 平方公尺','120 平方公尺','240 平方公尺'],answer:2,explain:'面積 = 長 × 寬 = 15 × 8 = 120 平方公尺。'},
-  {subject:'數學',grade:4,type:'小數',q:'4.6 − 1.75 = ?',options:['2.75','2.85','3.15','3.85'],answer:1,explain:'4.60 − 1.75 = 2.85。'},
-  {subject:'數學',grade:4,type:'應用題',q:'一箱餅乾有 36 包，學校買了 15 箱，共有幾包？',options:['440 包','500 包','540 包','560 包'],answer:2,explain:'36 × 15 = 36 × (10 + 5) = 360 + 180 = 540。'},
-  {subject:'數學',grade:4,type:'分數',q:'八分之三加上八分之二等於多少？',options:['八分之五','十六分之五','四分之一','八分之一'],answer:0,explain:'分母相同，分子相加：3/8 + 2/8 = 5/8。'},
-  {subject:'數學',grade:4,type:'選擇題',q:'864 ÷ 12 = ?',options:['62','72','82','92'],answer:1,explain:'12 × 72 = 864。'},
-  {subject:'數學',grade:4,type:'應用題',q:'一輛車每小時行駛 65 公里，行駛 4 小時共走多少公里？',options:['240 公里','250 公里','260 公里','270 公里'],answer:2,explain:'65 × 4 = 260 公里。'},
-  {subject:'數學',grade:4,type:'角度',q:'直角是多少度？',options:['45 度','90 度','180 度','360 度'],answer:1,explain:'直角是 90 度。'},
-  {subject:'數學',grade:4,type:'選擇題',q:'2.35 + 4.8 = ?',options:['6.15','7.15','7.25','8.15'],answer:1,explain:'4.8 = 4.80，2.35 + 4.80 = 7.15。'},
-  {subject:'數學',grade:4,type:'應用題',q:'一條步道長 2.4 公里，小玲走了 3 條一樣長的步道，共走幾公里？',options:['5.2 公里','6.2 公里','7.2 公里','8.2 公里'],answer:2,explain:'2.4 × 3 = 7.2 公里。'},
-  {subject:'數學',grade:4,type:'選擇題',q:'5600 ÷ 100 = ?',options:['56','560','5600','5.6'],answer:0,explain:'除以 100，小數點往左移兩位：5600 ÷ 100 = 56。'},
-  {subject:'數學',grade:4,type:'應用題',q:'一個正方形操場邊長 25 公尺，繞操場一圈是多少公尺？',options:['50 公尺','75 公尺','100 公尺','125 公尺'],answer:2,explain:'正方形周長 = 25 × 4 = 100 公尺。'},
-  {subject:'數學',grade:4,type:'分數',q:'下面哪一個分數和四分之二相等？',options:['二分之一','三分之一','三分之二','五分之二'],answer:0,explain:'四分之二約分後是二分之一。'},
-  {subject:'數學',grade:4,type:'選擇題',q:'48 × 25 = ?',options:['1000','1100','1200','1300'],answer:2,explain:'25 × 48 = 25 × (50 − 2) = 1250 − 50 = 1200。'},
-  {subject:'數學',grade:4,type:'應用題',q:'一本筆記本 32 元，買 7 本付 250 元，應找回多少元？',options:['16 元','24 元','26 元','32 元'],answer:2,explain:'32 × 7 = 224，250 − 224 = 26。'},
-  {subject:'數學',grade:4,type:'容量',q:'3 公升 250 毫升等於多少毫升？',options:['325 毫升','1250 毫升','3250 毫升','3025 毫升'],answer:2,explain:'3 公升 = 3000 毫升，3000 + 250 = 3250 毫升。'},
-  {subject:'數學',grade:4,type:'選擇題',q:'9000 − 2675 = ?',options:['6225','6325','6425','6525'],answer:1,explain:'9000 − 2675 = 6325。'},
-  {subject:'數學',grade:4,type:'應用題',q:'一塊布長 12.5 公尺，剪下 3.8 公尺後，再剪下 2.7 公尺，還剩幾公尺？',options:['5 公尺','6 公尺','6.5 公尺','7 公尺'],answer:1,explain:'12.5 − 3.8 = 8.7，8.7 − 2.7 = 6。'},
-  {subject:'數學',grade:4,type:'統計',q:'班上 4 位同學閱讀本數分別是 3、5、4、6 本，總共閱讀幾本？',options:['16 本','17 本','18 本','19 本'],answer:2,explain:'3 + 5 + 4 + 6 = 18。'},
-  {subject:'數學',grade:4,type:'選擇題',q:'5 公里 80 公尺等於多少公尺？',options:['580 公尺','5080 公尺','50080 公尺','508 公尺'],answer:1,explain:'5 公里 = 5000 公尺，5000 + 80 = 5080 公尺。'}
-];
+// 數學三年級
+add('數學',3,'選擇題','7 × 8 = ?',['54','56','63','48'],1,'7 × 8 = 56。');
+add('數學',3,'應用題','一張票 35 元，買 4 張票要多少元？',['120 元','130 元','140 元','150 元'],2,'35 × 4 = 140。');
+add('數學',3,'選擇題','96 ÷ 8 = ?',['10','11','12','13'],2,'8 × 12 = 96。');
+add('數學',3,'應用題','繩子長 3 公尺 25 公分，另一條長 2 公尺 40 公分，合起來長多少？',['5 公尺 55 公分','5 公尺 65 公分','6 公尺 5 公分','4 公尺 65 公分'],1,'3 公尺 25 公分 + 2 公尺 40 公分 = 5 公尺 65 公分。');
+add('數學',3,'選擇題','246 + 135 = ?',['371','381','391','361'],1,'246 + 135 = 381。');
+add('數學',3,'應用題','一箱飲料有 24 瓶，超商進了 6 箱，共有幾瓶？',['120 瓶','144 瓶','150 瓶','164 瓶'],1,'24 × 6 = 144。');
+add('數學',3,'選擇題','503 − 278 = ?',['225','235','215','325'],0,'503 − 278 = 225。');
+add('數學',3,'應用題','老師把 72 張色紙平均分給 9 組，每組有幾張？',['7 張','8 張','9 張','10 張'],1,'72 ÷ 9 = 8。');
+add('數學',3,'分數','把一個披薩平均分成 4 份，吃了其中 1 份，吃了幾分之幾？',['四分之一','四分之二','一分之四','二分之一'],0,'平均分成 4 份，吃 1 份是四分之一。');
+add('數學',3,'選擇題','36 × 3 = ?',['98','108','118','128'],1,'36 × 3 = 108。');
+add('數學',3,'應用題','一條緞帶長 5 公尺，剪下 175 公分後，還剩多少公分？',['225 公分','275 公分','325 公分','425 公分'],2,'5 公尺 = 500 公分，500 − 175 = 325 公分。');
+add('數學',3,'時間','上午 9 點 45 分到上午 11 點 15 分，經過多久？',['1 小時 20 分','1 小時 30 分','1 小時 40 分','2 小時 30 分'],1,'9:45 到 10:45 是 1 小時，再到 11:15 是 30 分，共 1 小時 30 分。');
+add('數學',3,'選擇題','84 ÷ 4 = ?',['19','20','21','22'],2,'84 ÷ 4 = 21。');
+add('數學',3,'應用題','每張郵票 5 元，買 18 張要多少元？',['80 元','85 元','90 元','95 元'],2,'5 × 18 = 90。');
+add('數學',3,'圖形','正方形有幾條一樣長的邊？',['2 條','3 條','4 條','5 條'],2,'正方形的 4 條邊都一樣長。');
+add('數學',3,'選擇題','125 × 4 = ?',['400','450','500','550'],2,'125 × 4 = 500。');
+add('數學',3,'應用題','小威有 100 元，買文具花了 68 元，剩下的錢再買 4 枝一樣的筆，每枝筆多少元？',['6 元','7 元','8 元','9 元'],2,'100 − 68 = 32，32 ÷ 4 = 8。');
+add('數學',3,'分數','哪一個分數比二分之一大？',['四分之一','三分之一','四分之三','五分之一'],2,'四分之三大於二分之一。');
+add('數學',3,'選擇題','700 − 356 = ?',['334','344','354','364'],1,'700 − 356 = 344。');
+add('數學',3,'應用題','農夫採了 96 顆芒果，每 12 顆裝一箱，可以裝幾箱？',['6 箱','7 箱','8 箱','9 箱'],2,'96 ÷ 12 = 8。');
+add('數學',3,'重量','3 公斤 500 公克加上 2 公斤，一共是多少？',['4 公斤 500 公克','5 公斤','5 公斤 500 公克','6 公斤 500 公克'],2,'3 公斤 500 公克 + 2 公斤 = 5 公斤 500 公克。');
+add('數學',3,'選擇題','48 ÷ 6 + 7 = ?',['13','14','15','16'],2,'48 ÷ 6 = 8，8 + 7 = 15。');
+add('數學',3,'應用題','一本故事書有 120 頁，小芳每天看 15 頁，看完需要幾天？',['6 天','7 天','8 天','9 天'],2,'120 ÷ 15 = 8。');
+add('數學',3,'數線','在數線上，450 的下一個整百數是？',['400','450','500','550'],2,'450 往上到下一個整百數是 500。');
+
+// 數學四年級
+add('數學',4,'選擇題','125 × 6 = ?',['650','700','750','800'],2,'100×6=600，20×6=120，5×6=30，共 750。');
+add('數學',4,'應用題','一個長方形長 12 公分、寬 7 公分，它的周長是多少公分？',['19 公分','38 公分','84 公分','24 公分'],1,'周長 = (12 + 7) × 2 = 38 公分。');
+add('數學',4,'選擇題','3.75 + 2.4 = ?',['5.15','6.15','6.25','5.25'],1,'2.4 可以寫成 2.40，所以 3.75 + 2.40 = 6.15。');
+add('數學',4,'應用題','一瓶果汁有 1.5 公升，買 3 瓶共有幾公升？',['3.5 公升','4 公升','4.5 公升','5 公升'],2,'1.5 × 3 = 4.5 公升。');
+add('數學',4,'選擇題','325 × 4 = ?',['1200','1300','1400','1500'],1,'325 × 4 = 1300。');
+add('數學',4,'應用題','一個長方形花圃長 15 公尺、寬 8 公尺，面積是多少平方公尺？',['23 平方公尺','46 平方公尺','120 平方公尺','240 平方公尺'],2,'面積 = 長 × 寬 = 15 × 8 = 120 平方公尺。');
+add('數學',4,'小數','4.6 − 1.75 = ?',['2.75','2.85','3.15','3.85'],1,'4.60 − 1.75 = 2.85。');
+add('數學',4,'應用題','一箱餅乾有 36 包，學校買了 15 箱，共有幾包？',['440 包','500 包','540 包','560 包'],2,'36 × 15 = 36 × (10 + 5) = 360 + 180 = 540。');
+add('數學',4,'分數','八分之三加上八分之二等於多少？',['八分之五','十六分之五','四分之一','八分之一'],0,'分母相同，分子相加：3/8 + 2/8 = 5/8。');
+add('數學',4,'選擇題','864 ÷ 12 = ?',['62','72','82','92'],1,'12 × 72 = 864。');
+add('數學',4,'應用題','一輛車每小時行駛 65 公里，行駛 4 小時共走多少公里？',['240 公里','250 公里','260 公里','270 公里'],2,'65 × 4 = 260 公里。');
+add('數學',4,'角度','直角是多少度？',['45 度','90 度','180 度','360 度'],1,'直角是 90 度。');
+add('數學',4,'選擇題','2.35 + 4.8 = ?',['6.15','7.15','7.25','8.15'],1,'4.8 = 4.80，2.35 + 4.80 = 7.15。');
+add('數學',4,'應用題','一條步道長 2.4 公里，小玲走了 3 條一樣長的步道，共走幾公里？',['5.2 公里','6.2 公里','7.2 公里','8.2 公里'],2,'2.4 × 3 = 7.2 公里。');
+add('數學',4,'選擇題','5600 ÷ 100 = ?',['56','560','5600','5.6'],0,'除以 100，小數點往左移兩位：5600 ÷ 100 = 56。');
+add('數學',4,'應用題','一個正方形操場邊長 25 公尺，繞操場一圈是多少公尺？',['50 公尺','75 公尺','100 公尺','125 公尺'],2,'正方形周長 = 25 × 4 = 100 公尺。');
+add('數學',4,'分數','下面哪一個分數和四分之二相等？',['二分之一','三分之一','三分之二','五分之二'],0,'四分之二約分後是二分之一。');
+add('數學',4,'選擇題','48 × 25 = ?',['1000','1100','1200','1300'],2,'25 × 48 = 25 × (50 − 2) = 1250 − 50 = 1200。');
+add('數學',4,'應用題','一本筆記本 32 元，買 7 本付 250 元，應找回多少元？',['16 元','24 元','26 元','32 元'],2,'32 × 7 = 224，250 − 224 = 26。');
+add('數學',4,'容量','3 公升 250 毫升等於多少毫升？',['325 毫升','1250 毫升','3250 毫升','3025 毫升'],2,'3 公升 = 3000 毫升，3000 + 250 = 3250 毫升。');
+add('數學',4,'選擇題','9000 − 2675 = ?',['6225','6325','6425','6525'],1,'9000 − 2675 = 6325。');
+add('數學',4,'應用題','一塊布長 12.5 公尺，剪下 3.8 公尺後，再剪下 2.7 公尺，還剩幾公尺？',['5 公尺','6 公尺','6.5 公尺','7 公尺'],1,'12.5 − 3.8 = 8.7，8.7 − 2.7 = 6。');
+add('數學',4,'統計','班上 4 位同學閱讀本數分別是 3、5、4、6 本，總共閱讀幾本？',['16 本','17 本','18 本','19 本'],2,'3 + 5 + 4 + 6 = 18。');
+add('數學',4,'選擇題','5 公里 80 公尺等於多少公尺？',['580 公尺','5080 公尺','50080 公尺','508 公尺'],1,'5 公里 = 5000 公尺，5000 + 80 = 5080 公尺。');
 
 let subject = '';
 let grades = [];
+let selectedTypes = [];
+let selectedCount = 10;
+let testQuestions = [];
+let index = 0;
 let current = null;
 let answered = false;
-let total = 0;
 let correct = 0;
-let queue = [];
-let queueIndex = 0;
+let answeredCount = 0;
+let wrongQuestions = [];
+let retryMode = false;
 const $ = id => document.getElementById(id);
 
-function shuffle(items) {
-  const a = [...items];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
+function shuffle(list) { const a = [...list]; for (let i=a.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function uniqueTypesForSubject() { return [...new Set(questionBank.filter(q => q.subject === subject).map(q => q.type))].sort((a,b)=>a.localeCompare(b,'zh-Hant')); }
+function renderTypeFilters() {
+  const box = $('typeFilters'); box.innerHTML = '';
+  if (!subject) { box.innerHTML = '<p class="tips">請先選擇科目。</p>'; return; }
+  uniqueTypesForSubject().forEach(type => {
+    const label = document.createElement('label'); label.className = 'type-label';
+    label.innerHTML = `<input type="checkbox" value="${type}">${type}`;
+    box.appendChild(label);
+  });
 }
 
 document.querySelectorAll('.subject-btn').forEach(btn => btn.addEventListener('click', () => {
   subject = btn.dataset.subject;
   document.querySelectorAll('.subject-btn').forEach(b => b.classList.toggle('active', b === btn));
+  renderTypeFilters();
 }));
 
-$('startBtn').addEventListener('click', () => {
+document.querySelectorAll('.number-btn').forEach(btn => btn.addEventListener('click', () => {
+  selectedCount = Number(btn.dataset.count);
+  document.querySelectorAll('.number-btn').forEach(b => b.classList.toggle('active', b === btn));
+}));
+
+$('startBtn').addEventListener('click', () => startTest());
+$('nextBtn').addEventListener('click', () => { if (!answered) { alert('請先選擇答案，再進入下一題。'); return; } nextQuestion(); });
+$('submitBtn').addEventListener('click', () => { if (confirm('確定要現在交卷嗎？尚未作答的題目不會計分。')) showResults(); });
+$('backBtn').addEventListener('click', () => { $('quiz').classList.add('hidden'); $('setup').classList.remove('hidden'); clearCanvas(); });
+$('newTestBtn').addEventListener('click', () => { $('result').classList.add('hidden'); $('setup').classList.remove('hidden'); });
+$('retryWrongBtn').addEventListener('click', () => {
+  if (!wrongQuestions.length) return;
+  retryMode = true; testQuestions = shuffle(wrongQuestions.map(x => x.question)); index = 0; correct = 0; answeredCount = 0; wrongQuestions = [];
+  $('result').classList.add('hidden'); $('quiz').classList.remove('hidden'); showQuestion();
+});
+
+function startTest() {
   grades = [...document.querySelectorAll('.grade-label input:checked')].map(i => Number(i.value));
+  selectedTypes = [...document.querySelectorAll('#typeFilters input:checked')].map(i => i.value);
   if (!subject) return alert('請先選擇「國語」或「數學」。');
   if (!grades.length) return alert('請至少勾選一個年級。');
-  const pool = questionBank.filter(x => x.subject === subject && grades.includes(x.grade));
-  queue = shuffle(pool);
-  queueIndex = 0; total = 0; correct = 0;
-  $('setup').classList.add('hidden');
-  $('quiz').classList.remove('hidden');
+  let pool = questionBank.filter(q => q.subject === subject && grades.includes(q.grade));
+  if (selectedTypes.length) pool = pool.filter(q => selectedTypes.includes(q.type));
+  if (!pool.length) return alert('找不到符合條件的題目，請調整題型或年級。');
+  testQuestions = shuffle(pool);
+  if (selectedCount > 0) testQuestions = testQuestions.slice(0, Math.min(selectedCount, testQuestions.length));
+  index = 0; correct = 0; answeredCount = 0; wrongQuestions = []; retryMode = false;
+  $('setup').classList.add('hidden'); $('result').classList.add('hidden'); $('quiz').classList.remove('hidden');
   showQuestion();
-});
-
-$('nextBtn').addEventListener('click', showQuestion);
-$('backBtn').addEventListener('click', () => {
-  $('quiz').classList.add('hidden');
-  $('setup').classList.remove('hidden');
-});
+}
 
 function showQuestion() {
-  if (queueIndex >= queue.length) {
-    queue = shuffle(queue);
-    queueIndex = 0;
-  }
-  current = queue[queueIndex++];
-  answered = false;
-  $('subjectBadge').textContent = subject;
+  if (index >= testQuestions.length) { showResults(); return; }
+  current = testQuestions[index]; answered = false;
+  $('subjectBadge').textContent = current.subject;
   $('gradeBadge').textContent = `${current.grade} 年級`;
-  $('type').textContent = current.type;
+  $('typeBadge').textContent = current.type;
   $('question').textContent = current.q;
-  $('feedback').textContent = '';
-  $('feedback').className = 'feedback';
-  updateStatus();
-  const shuffledOptions = shuffle(current.options.map((text,index) => ({text,index})));
+  $('feedback').textContent = ''; $('feedback').className = 'feedback';
   $('options').innerHTML = '';
-  shuffledOptions.forEach(item => {
-    const button = document.createElement('button');
-    button.className = 'option';
-    button.type = 'button';
-    button.textContent = item.text;
-    button.addEventListener('click', () => checkAnswer(item.index, button));
-    $('options').appendChild(button);
+  shuffle(current.options.map((text,answerIndex)=>({text,answerIndex}))).forEach(item => {
+    const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'option'; btn.textContent = item.text;
+    btn.addEventListener('click', () => checkAnswer(item.answerIndex, btn)); $('options').appendChild(btn);
   });
+  $('workArea').classList.toggle('hidden', current.subject !== '數學');
+  if (current.subject === '數學') { resizeCanvas(); clearCanvas(); }
+  updateStatus();
 }
 
-function updateStatus() {
-  $('score').textContent = `答對 ${correct}／${total} 題`;
-  const done = queueIndex;
-  const percent = queue.length ? (done / queue.length) * 100 : 0;
-  $('progressBar').style.width = `${percent}%`;
-  $('remaining').textContent = `本輪第 ${done}／${queue.length} 題；題庫用完後會重新洗牌繼續出題。`;
-}
-
-function checkAnswer(index, selected) {
+function checkAnswer(answerIndex, selectedButton) {
   if (answered) return;
-  answered = true;
-  total++;
-  const buttons = [...document.querySelectorAll('.option')];
-  buttons.forEach(button => button.disabled = true);
-  const correctText = current.options[current.answer];
-  const answerButton = buttons.find(button => button.textContent === correctText);
-  if (index === current.answer) {
-    correct++;
-    selected.classList.add('correct');
-    $('feedback').textContent = `答對了！${current.explain}`;
-    $('feedback').className = 'feedback ok';
+  answered = true; answeredCount++;
+  const buttons = [...document.querySelectorAll('.option')]; buttons.forEach(b => b.disabled = true);
+  const isCorrect = answerIndex === current.answer;
+  const correctButton = buttons.find(b => b.textContent === current.options[current.answer]);
+  if (isCorrect) {
+    correct++; selectedButton.classList.add('correct');
+    $('feedback').textContent = `答對了！${current.explain}`; $('feedback').className = 'feedback ok';
   } else {
-    selected.classList.add('wrong');
-    if (answerButton) answerButton.classList.add('correct');
-    $('feedback').textContent = `再想一想！${current.explain}`;
-    $('feedback').className = 'feedback bad';
+    selectedButton.classList.add('wrong'); if (correctButton) correctButton.classList.add('correct');
+    wrongQuestions.push({question:current, chosen:current.options[answerIndex]});
+    $('feedback').textContent = `再想一想！${current.explain}`; $('feedback').className = 'feedback bad';
   }
   updateStatus();
 }
+
+function nextQuestion() { index++; showQuestion(); }
+function updateStatus() {
+  const total = testQuestions.length;
+  $('score').textContent = `答對 ${correct}／${answeredCount} 題`;
+  $('remaining').textContent = `第 ${index + 1}／${total} 題${retryMode ? '（錯題複習）' : ''}`;
+  $('progressBar').style.width = `${(index / total) * 100}%`;
+  $('nextBtn').textContent = index === total - 1 ? '完成並交卷' : '下一題';
+}
+
+function showResults() {
+  $('quiz').classList.add('hidden'); $('result').classList.remove('hidden'); clearCanvas();
+  const name = $('studentName').value.trim();
+  const total = testQuestions.length;
+  const percent = total ? Math.round((correct / total) * 100) : 0;
+  $('resultName').textContent = name ? `${name} 的測驗結果` : '本次測驗結果';
+  $('resultScore').textContent = `答對 ${correct}／${total} 題，正確率 ${percent}%`;
+  $('resultMessage').textContent = percent >= 90 ? '太棒了！繼續保持！' : percent >= 70 ? '表現很好，再複習錯題會更進步！' : '別灰心，從錯題再練一次，就會越來越熟練！';
+  const list = $('wrongList'); list.innerHTML = '';
+  if (!wrongQuestions.length) {
+    list.innerHTML = '<div class="empty">全部答對，沒有錯題！</div>';
+    $('retryWrongBtn').classList.add('hidden');
+  } else {
+    $('retryWrongBtn').classList.remove('hidden');
+    wrongQuestions.forEach((item,n) => {
+      const q = item.question; const card = document.createElement('article'); card.className = 'wrong-card';
+      card.innerHTML = `<p><strong>第 ${n+1} 題｜${q.subject} ${q.grade} 年級・${q.type}</strong></p><p>${escapeHtml(q.q)}</p><p>你的答案：${escapeHtml(item.chosen)}</p><p class="answer">正確答案：${escapeHtml(q.options[q.answer])}</p><p>解說：${escapeHtml(q.explain)}</p>`;
+      list.appendChild(card);
+    });
+  }
+}
+function escapeHtml(text) { return String(text).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+const canvas = $('workCanvas'); const ctx = canvas.getContext('2d'); let drawing = false; let lastX = 0; let lastY = 0;
+function resizeCanvas() {
+  const ratio = window.devicePixelRatio || 1; const rect = canvas.getBoundingClientRect();
+  if (canvas.width !== Math.round(rect.width * ratio) || canvas.height !== Math.round(rect.height * ratio)) {
+    const old = document.createElement('canvas'); old.width = canvas.width; old.height = canvas.height; old.getContext('2d').drawImage(canvas,0,0);
+    canvas.width = Math.round(rect.width * ratio); canvas.height = Math.round(rect.height * ratio);
+    ctx.setTransform(ratio,0,0,ratio,0,0); ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#1f2937'; ctx.lineWidth = 3;
+  }
+}
+function clearCanvas() { if (!canvas.width) return; ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,canvas.width,canvas.height); ctx.restore(); }
+function point(e) { const r = canvas.getBoundingClientRect(); return {x:e.clientX-r.left,y:e.clientY-r.top}; }
+canvas.addEventListener('pointerdown', e => { drawing=true; canvas.setPointerCapture(e.pointerId); const p=point(e); lastX=p.x; lastY=p.y; });
+canvas.addEventListener('pointermove', e => { if (!drawing) return; const p=point(e); ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(p.x,p.y); ctx.stroke(); lastX=p.x; lastY=p.y; });
+canvas.addEventListener('pointerup', () => drawing=false); canvas.addEventListener('pointercancel', () => drawing=false);
+$('clearCanvasBtn').addEventListener('click', clearCanvas); window.addEventListener('resize', () => { if (!$('workArea').classList.contains('hidden')) resizeCanvas(); });
+renderTypeFilters();
 </script>
 </body>
 </html>
