@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>國小國語・數學綜合練習</title>
+  <style>
+    :root { --primary:#2563eb; --accent:#f59e0b; --ok:#15803d; --bad:#dc2626; --ink:#1f2937; --paper:#fff; --bg:#eef6ff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif; color:var(--ink); background:linear-gradient(135deg,#e0f2fe,#fef3c7); min-height:100vh; }
+    .wrap { max-width:900px; margin:auto; padding:28px 16px 48px; }
+    header { text-align:center; margin-bottom:22px; }
+    h1 { margin:0; font-size:clamp(1.7rem,5vw,2.45rem); color:#1d4ed8; }
+    header p { margin:8px 0 0; color:#475569; }
+    .card { background:rgba(255,255,255,.95); border-radius:20px; padding:22px; box-shadow:0 12px 32px rgba(30,64,175,.15); }
+    .hidden { display:none !important; }
+    h2 { margin:0 0 14px; font-size:1.28rem; }
+    .subject-row,.grade-grid { display:flex; gap:12px; flex-wrap:wrap; }
+    .subject-btn { flex:1 1 180px; border:3px solid #bfdbfe; background:#eff6ff; border-radius:16px; min-height:78px; cursor:pointer; font-size:1.2rem; font-weight:700; color:#1e40af; }
+    .subject-btn.active { border-color:var(--primary); background:#dbeafe; box-shadow:0 0 0 3px #bfdbfe; }
+    .grade-label { display:flex; align-items:center; justify-content:center; gap:7px; flex:1 1 140px; min-height:54px; padding:8px; border:2px solid #e2e8f0; border-radius:12px; cursor:pointer; font-size:1.05rem; font-weight:700; }
+    .grade-label:has(input:checked) { background:#ecfdf5; border-color:#22c55e; color:#166534; }
+    input[type="checkbox"] { width:19px; height:19px; accent-color:#16a34a; }
+    .actions { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:22px; }
+    button { border:0; border-radius:12px; padding:12px 19px; cursor:pointer; font-size:1rem; font-weight:700; }
+    .primary { background:var(--primary); color:#fff; } .primary:hover { background:#1d4ed8; }
+    .secondary { background:#e2e8f0; color:#334155; } .secondary:hover { background:#cbd5e1; }
+    .quiz-top { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+    .badge { display:inline-block; padding:6px 10px; border-radius:999px; background:#dbeafe; color:#1d4ed8; font-weight:700; }
+    .score { font-weight:700; color:#475569; }
+    .question-box { background:#f8fafc; border:2px solid #e2e8f0; border-radius:16px; padding:20px; }
+    .question { font-size:1.35rem; font-weight:700; line-height:1.7; margin:0 0 18px; }
+    .options { display:grid; gap:10px; }
+    .option { width:100%; text-align:left; background:#fff; border:2px solid #cbd5e1; color:#334155; padding:13px 15px; border-radius:12px; font-weight:600; }
+    .option:hover:not(:disabled) { border-color:#60a5fa; background:#eff6ff; }
+    .option.correct { background:#dcfce7; border-color:#22c55e; color:#166534; }
+    .option.wrong { background:#fee2e2; border-color:#ef4444; color:#991b1b; }
+    .feedback { min-height:31px; margin:15px 0 0; font-size:1.05rem; font-weight:700; line-height:1.5; }
+    .feedback.ok { color:var(--ok); } .feedback.bad { color:var(--bad); }
+    .tips { font-size:.92rem; color:#64748b; margin:16px 0 0; text-align:center; }
+    @media (max-width:520px) { .card{padding:17px} .question{font-size:1.18rem} }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <h1>🌟 國小綜合練習</h1>
+      <p>先選科目，再勾選一個或多個年級，開始隨機換題練習！</p>
+    </header>
+
+    <section id="setup" class="card">
+      <h2>1. 選擇科目</h2>
+      <div class="subject-row" aria-label="選擇科目">
+        <button class="subject-btn" type="button" data-subject="國語">📖 國語</button>
+        <button class="subject-btn" type="button" data-subject="數學">🔢 數學</button>
+      </div>
+      <h2 style="margin-top:24px">2. 複選要練習的年級</h2>
+      <div class="grade-grid">
+        <label class="grade-label"><input type="checkbox" value="1">一年級</label>
+        <label class="grade-label"><input type="checkbox" value="2">二年級</label>
+        <label class="grade-label"><input type="checkbox" value="3">三年級</label>
+        <label class="grade-label"><input type="checkbox" value="4">四年級</label>
+      </div>
+      <div class="actions"><button id="startBtn" class="primary" type="button">開始練習</button></div>
+      <p class="tips">題庫目前內建國語：錯字、造句、拼字、形容詞；數學：選擇題、應用題。可直接在程式中的 <code>questionBank</code> 增加題目。</p>
+    </section>
+
+    <section id="quiz" class="card hidden" aria-live="polite">
+      <div class="quiz-top">
+        <div><span id="subjectBadge" class="badge"></span> <span id="gradeBadge" class="badge"></span></div>
+        <div id="score" class="score">答對 0／0 題</div>
+      </div>
+      <div class="question-box">
+        <p id="type" class="badge"></p>
+        <p id="question" class="question"></p>
+        <div id="options" class="options"></div>
+        <p id="feedback" class="feedback"></p>
+      </div>
+      <div class="actions">
+        <button id="nextBtn" class="primary" type="button">換一題</button>
+        <button id="backBtn" class="secondary" type="button">重新選擇</button>
+      </div>
+    </section>
+  </main>
+
+<script>
+const questionBank = [
+  // 國語一年級
+  {subject:'國語', grade:1, type:'改錯字', q:'請找出句子中的錯字：\n「小明在草地上玩皮球。」', options:['明 → 名','地 → 的','皮 → 比','玩 → 完'], answer:0, explain:'人名「小明」的「明」是正確的；本題正確句子其實沒有錯字。這是一題陷阱題，請按「換一題」再挑戰！', trick:true},
+  {subject:'國語', grade:1, type:'拼字', q:'「太陽」的「陽」讀音最接近哪一個？', options:['洋','羊','樣','揚'], answer:1, explain:'「陽」和「羊」都讀 ㄧㄤˊ。'},
+  {subject:'國語', grade:1, type:'選正確形容詞', q:'請選出最適合的詞：\n「蘋果吃起來＿＿＿的。」', options:['甜甜','跑跑','看看','睡睡'], answer:0, explain:'「甜甜」可以形容蘋果的味道。'},
+  {subject:'國語', grade:1, type:'造句', q:'哪一句話正確使用了「開心」？', options:['我今天得到禮物，覺得很開心。','開心在桌上寫字。','媽媽買開心回家。','小狗開心一碗飯。'], answer:0, explain:'「開心」用來形容快樂的心情。'},
+  // 國語二年級
+  {subject:'國語', grade:2, type:'改錯字', q:'請找出錯字並選出正確寫法：\n「妹妹在公園裡跳舞，真快樂。」', options:['園 → 元','裡 → 理','舞 → 午','這一句沒有錯字'], answer:3, explain:'這一句的字都寫正確。'},
+  {subject:'國語', grade:2, type:'選正確形容詞', q:'請選出最適合的詞：\n「夜晚的天空＿＿＿的，還有許多星星。」', options:['黑黑','香香','酸酸','重重'], answer:0, explain:'夜晚的天空看起來黑黑的。'},
+  {subject:'國語', grade:2, type:'拼字', q:'「跑步」的「步」部首是什麼？', options:['止','足','走','口'], answer:0, explain:'「步」的部首是「止」。'},
+  {subject:'國語', grade:2, type:'造句', q:'哪一句話把「一邊……一邊……」用得最正確？', options:['我一邊聽音樂，一邊畫畫。','我一邊書包，一邊上學。','一邊小狗很可愛。','我一邊吃飯很香。'], answer:0, explain:'「一邊……一邊……」表示同時進行兩件事。'},
+  // 國語三年級
+  {subject:'國語', grade:3, type:'改錯字', q:'請找出錯字並選出正確寫法：\n「下課鐘聲想起，同學們高興地跑到操場。」', options:['鐘 → 中','想 → 響','興 → 幸','地 → 的'], answer:1, explain:'聲音發出時用「響起」，不是「想起」。'},
+  {subject:'國語', grade:3, type:'選正確形容詞', q:'請選出最適合的詞：\n「經過一夜大雨，河水變得＿＿＿。」', options:['清澈','混濁','安靜','柔軟'], answer:1, explain:'大雨會把泥沙沖進河裡，河水常會變得混濁。'},
+  {subject:'國語', grade:3, type:'拼字', q:'「觀察」的「察」最可能和哪個意思有關？', options:['仔細看','快速跑','大聲說','用力拿'], answer:0, explain:'觀察是仔細地看、留意事物。'},
+  {subject:'國語', grade:3, type:'造句', q:'哪一句話正確使用了「雖然……但是……」？', options:['雖然下雨，但是我們還是帶傘出門。','雖然我帶傘，雨很大。','但是下雨，雖然帶傘。','我雖然一個蘋果但是。'], answer:0, explain:'「雖然……但是……」用來表達前後有轉折關係。'},
+  // 國語四年級
+  {subject:'國語', grade:4, type:'改錯字', q:'請找出錯字並選出正確寫法：\n「這本書的內容十分精采，令我愛不釋手。」', options:['容 → 榮','分 → 份','精采 → 精彩','釋 → 釋'], answer:2, explain:'「精彩」通常寫作「精」「彩」。'},
+  {subject:'國語', grade:4, type:'選正確形容詞', q:'請選出最適合的詞：\n「登上山頂後，眼前的景色非常＿＿＿。」', options:['壯麗','狹小','吵鬧','苦澀'], answer:0, explain:'「壯麗」適合形容宏偉、美麗的自然景色。'},
+  {subject:'國語', grade:4, type:'詞語理解', q:'「迫不及待」最接近下面哪一個意思？', options:['急著想要立刻做','慢慢等待時機','不想參加活動','安靜休息一下'], answer:0, explain:'「迫不及待」形容心情急切，等不及要去做。'},
+  {subject:'國語', grade:4, type:'造句', q:'哪一句話正確使用了「不但……還……」？', options:['小芸不但會游泳，還會騎腳踏車。','不但小芸游泳，還。','小芸還不但去游泳。','不但會小芸，還游泳。'], answer:0, explain:'「不但……還……」用來補充更多同類的優點或事實。'},
+
+  // 數學一年級
+  {subject:'數學', grade:1, type:'選擇題', q:'7 + 5 = ?', options:['11','12','13','14'], answer:1, explain:'7 加 5 等於 12。'},
+  {subject:'數學', grade:1, type:'應用題', q:'小華有 9 顆糖，吃了 3 顆，還剩幾顆？', options:['5 顆','6 顆','7 顆','12 顆'], answer:1, explain:'9 − 3 = 6，所以剩下 6 顆。'},
+  {subject:'數學', grade:1, type:'選擇題', q:'哪一個數字最大？', options:['8','15','12','9'], answer:1, explain:'15 比 8、12、9 都大。'},
+  {subject:'數學', grade:1, type:'應用題', q:'桌上有 4 本書，又拿來 6 本，一共有幾本？', options:['2 本','10 本','11 本','12 本'], answer:1, explain:'4 + 6 = 10。'},
+  // 數學二年級
+  {subject:'數學', grade:2, type:'選擇題', q:'34 + 28 = ?', options:['52','62','72','64'], answer:1, explain:'34 + 20 = 54，54 + 8 = 62。'},
+  {subject:'數學', grade:2, type:'應用題', q:'一盒彩色筆有 12 支，老師買了 3 盒，共有幾支？', options:['15 支','24 支','36 支','48 支'], answer:2, explain:'12 × 3 = 36。'},
+  {subject:'數學', grade:2, type:'選擇題', q:'63 − 27 = ?', options:['36','46','40','34'], answer:0, explain:'63 − 20 = 43，43 − 7 = 36。'},
+  {subject:'數學', grade:2, type:'應用題', q:'24 個餅乾平均分給 4 個小朋友，每人有幾個？', options:['5 個','6 個','7 個','8 個'], answer:1, explain:'24 ÷ 4 = 6。'},
+  // 數學三年級
+  {subject:'數學', grade:3, type:'選擇題', q:'7 × 8 = ?', options:['54','56','63','48'], answer:1, explain:'7 × 8 = 56。'},
+  {subject:'數學', grade:3, type:'應用題', q:'一張票 35 元，買 4 張票要多少元？', options:['120 元','130 元','140 元','150 元'], answer:2, explain:'35 × 4 = 140。'},
+  {subject:'數學', grade:3, type:'選擇題', q:'96 ÷ 8 = ?', options:['10','11','12','13'], answer:2, explain:'8 × 12 = 96。'},
+  {subject:'數學', grade:3, type:'應用題', q:'繩子長 3 公尺 25 公分，另一條長 2 公尺 40 公分，合起來長多少？', options:['5 公尺 55 公分','5 公尺 65 公分','6 公尺 5 公分','4 公尺 65 公分'], answer:1, explain:'3 公尺 25 公分 + 2 公尺 40 公分 = 5 公尺 65 公分。'},
+  // 數學四年級
+  {subject:'數學', grade:4, type:'選擇題', q:'125 × 6 = ?', options:['650','700','750','800'], answer:2, explain:'100×6=600，20×6=120，5×6=30，共 750。'},
+  {subject:'數學', grade:4, type:'應用題', q:'一個長方形長 12 公分、寬 7 公分，它的周長是多少公分？', options:['19 公分','38 公分','84 公分','24 公分'], answer:1, explain:'周長 = (12 + 7) × 2 = 38 公分。'},
+  {subject:'數學', grade:4, type:'選擇題', q:'3.75 + 2.4 = ?', options:['5.15','6.15','6.25','5.25'], answer:1, explain:'2.4 可以寫成 2.40，所以 3.75 + 2.40 = 6.15。'},
+  {subject:'數學', grade:4, type:'應用題', q:'一瓶果汁有 1.5 公升，買 3 瓶共有幾公升？', options:['3.5 公升','4 公升','4.5 公升','5 公升'], answer:2, explain:'1.5 × 3 = 4.5 公升。'}
+];
+
+let subject = '';
+let grades = [];
+let current = null;
+let answered = false;
+let total = 0;
+let correct = 0;
+let lastQuestionId = -1;
+
+const $ = id => document.getElementById(id);
+
+document.querySelectorAll('.subject-btn').forEach(btn => btn.addEventListener('click', () => {
+  subject = btn.dataset.subject;
+  document.querySelectorAll('.subject-btn').forEach(b => b.classList.toggle('active', b === btn));
+}));
+
+$('startBtn').addEventListener('click', () => {
+  grades = [...document.querySelectorAll('.grade-label input:checked')].map(i => Number(i.value));
+  if (!subject) return alert('請先選擇「國語」或「數學」。');
+  if (!grades.length) return alert('請至少勾選一個年級。');
+  total = 0; correct = 0; lastQuestionId = -1;
+  $('setup').classList.add('hidden'); $('quiz').classList.remove('hidden');
+  showQuestion();
+});
+
+$('nextBtn').addEventListener('click', showQuestion);
+$('backBtn').addEventListener('click', () => {
+  $('quiz').classList.add('hidden'); $('setup').classList.remove('hidden');
+});
+
+function showQuestion() {
+  const pool = questionBank.filter(x => x.subject === subject && grades.includes(x.grade));
+  let picks = pool.map((x,i) => ({x,i})).filter(p => p.i !== lastQuestionId);
+  if (!picks.length) picks = pool.map((x,i) => ({x,i}));
+  const chosen = picks[Math.floor(Math.random() * picks.length)];
+  current = chosen.x; lastQuestionId = chosen.i; answered = false;
+  $('subjectBadge').textContent = subject;
+  $('gradeBadge').textContent = `${current.grade} 年級`;
+  $('type').textContent = current.type;
+  $('question').textContent = current.q;
+  $('feedback').textContent = '';
+  $('feedback').className = 'feedback';
+  $('score').textContent = `答對 ${correct}／${total} 題`;
+  const shuffled = current.options.map((text,index) => ({text,index})).sort(() => Math.random() - .5);
+  $('options').innerHTML = '';
+  shuffled.forEach(item => {
+    const b = document.createElement('button');
+    b.className = 'option'; b.type = 'button'; b.textContent = item.text;
+    b.addEventListener('click', () => checkAnswer(item.index, b));
+    $('options').appendChild(b);
+  });
+}
+
+function checkAnswer(index, selected) {
+  if (answered) return;
+  answered = true; total++;
+  const all = [...document.querySelectorAll('.option')];
+  all.forEach(b => b.disabled = true);
+  const isCorrect = index === current.answer && !current.trick;
+  if (isCorrect) {
+    correct++; selected.classList.add('correct');
+    $('feedback').textContent = `答對了！${current.explain}`;
+    $('feedback').className = 'feedback ok';
+  } else {
+    selected.classList.add('wrong');
+    const answerText = current.options[current.answer];
+    all.find(b => b.textContent === answerText)?.classList.add('correct');
+    $('feedback').textContent = `${current.trick ? '這題題目有問題，已略過計分。' : '再想一想！'} ${current.explain}`;
+    $('feedback').className = 'feedback bad';
+    if (current.trick) total--;
+  }
+  $('score').textContent = `答對 ${correct}／${total} 題`;
+}
+</script>
+</body>
+</html>
